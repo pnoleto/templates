@@ -2,16 +2,18 @@ using Infra.DI;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+builder.AddOpenTelemetryLogger();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer()
-    .AddSwaggerDefinitions(builder)
-    .AddInMemoryDbContext()
-    .AddRepositories()
-    .AddFeedRobots()
-    .AddRangFireSchedulerWithInMemoryDb()
-    .AddCorsDefinitions()
-    .AddLogging()
-    .AddMediator();
+     .AddOpenTelemetryInstrumentation(builder.Configuration)
+     .AddRangFireSchedulerWithInMemoryDb()
+     .AddSwaggerDefinitions(builder)
+     .AddInMemoryDbContext()
+     .AddCorsDefinitions()
+     .AddRepositories()
+     .AddFeedRobots()
+     .AddMediator()
+     .AddLogging();
 
 WebApplication app = builder.Build();
 
