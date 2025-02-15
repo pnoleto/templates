@@ -10,7 +10,7 @@ namespace Infra.RecurringJobs
         IGazetaRobot gazetaRobot,
         IRepositoryBase<ModelBase> repository)
     {
-        public async Task Execute(CancellationToken cancellationToken)
+        public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             try
             {

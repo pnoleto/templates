@@ -11,8 +11,12 @@ namespace Infra.DI
 {
     public static class OpenTelemetryRegister
     {
-        public static IServiceCollection AddOpenTelemetryInstrumentation(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddOpenTelemetryInstrumentation(this IServiceCollection services)
         {
+            IConfiguration configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+
+            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+
             services.AddOpenTelemetry()
               .ConfigureResource(resource => resource
                 .AddService(

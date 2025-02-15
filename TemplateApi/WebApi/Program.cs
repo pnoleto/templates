@@ -5,11 +5,12 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.AddOpenTelemetryLogger();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer()
-     .AddOpenTelemetryInstrumentation(builder.Configuration)
      .AddRangFireSchedulerWithInMemoryDb()
-     .AddSwaggerDefinitions(builder)
+     .AddOpenTelemetryInstrumentation()
+     .AddSwaggerDefinitions()
      .AddInMemoryDbContext()
      .AddCorsDefinitions()
+     .AddScheduledJobs()
      .AddRepositories()
      .AddFeedRobots()
      .AddMediator()
@@ -18,10 +19,7 @@ builder.Services.AddEndpointsApiExplorer()
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwaggerUIDefinitions(app.Services);
-}
+if (app.Environment.IsDevelopment()) app.UseSwaggerUIDefinitions();
 
 app.UseProtectedHangFireDashboard()
     .UseHttpsRedirection()

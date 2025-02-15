@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Tests", "Domain.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infra.Database.Tests", "Infra.Database.Tests\Infra.Database.Tests.csproj", "{0F5BA929-ABFE-4403-937A-D136109B0453}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infra.DI", "DI\Infra.DI.csproj", "{11CBDBD7-802B-4548-A513-6ED1E1436924}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infra.DI", "Infra.DI\Infra.DI.csproj", "{11CBDBD7-802B-4548-A513-6ED1E1436924}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Mapper", "Infra.Mapper\Application.Mapper.csproj", "{6EEF1522-0B5B-4F0E-87BE-2DDD04D637DE}"
 EndProject

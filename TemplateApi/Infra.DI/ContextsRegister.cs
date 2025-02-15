@@ -10,16 +10,16 @@ namespace Infra.DI
         private const int THIRTY_SECONDS = 30;
         private const int THREE_RETRIES = 3;
 
-        public static IServiceCollection AddSqlServerDbContext(this IServiceCollection services, IConfiguration configuration) =>
-            services.AddDbContext<NewsDbContext>(cfg => cfg.UseSqlServer(configuration.GetConnectionString("NewsConnection"),
+        public static IServiceCollection AddSqlServerDbContext(this IServiceCollection services, IConfiguration configuration, string connectionString) =>
+            services.AddDbContext<NewsDbContext>(cfg => cfg.UseSqlServer(configuration.GetConnectionString(connectionString),
                 props =>
                     props.CommandTimeout(THIRTY_SECONDS)
                     .EnableRetryOnFailure(THREE_RETRIES, TimeSpan.FromSeconds(THIRTY_SECONDS), null)
                     .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
                 ));
 
-        public static IServiceCollection AddPostgresDbContext(this IServiceCollection services, IConfiguration configuration) =>
-            services.AddDbContext<NewsDbContext>(cfg => cfg.UseNpgsql(configuration.GetConnectionString("NewsConnection"),
+        public static IServiceCollection AddPostgresDbContext(this IServiceCollection services, IConfiguration configuration, string connectionString) =>
+            services.AddDbContext<NewsDbContext>(cfg => cfg.UseNpgsql(configuration.GetConnectionString(connectionString),
                 props =>
                     props.CommandTimeout(THIRTY_SECONDS)
                     .EnableRetryOnFailure(THREE_RETRIES, TimeSpan.FromSeconds(THIRTY_SECONDS), null)
