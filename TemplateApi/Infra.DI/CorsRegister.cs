@@ -7,8 +7,8 @@ namespace Infra.DI
         public static IServiceCollection AddCorsDefinitions(this IServiceCollection services) =>
             services.AddCors(cors =>
                 cors.AddDefaultPolicy(policy =>
-                policy.AllowAnyHeader()
-                    .AllowAnyOrigin()
-                    .AllowAnyMethod()));
+                    policy.AllowAnyHeader()
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()));
     }
 }

@@ -5,7 +5,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.AddOpenTelemetryLogger();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer()
-     .AddRangFireSchedulerWithInMemoryDb()
+     .AddHangFireSchedulerWithInMemoryDb()
      .AddOpenTelemetryInstrumentation()
      .AddSwaggerDefinitions()
      .AddInMemoryDbContext()

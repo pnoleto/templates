@@ -12,6 +12,7 @@ namespace Infra.DI
     {
         public IEnumerable<string> ApiKeys { get; set; } = [];
     }
+
     public class ApiKeyAuthenticationSchemeHandler(
         IOptionsMonitor<ApiKeyAuthenticationSchemeOptions> options,
         ILoggerFactory logger,
@@ -39,16 +40,19 @@ namespace Infra.DI
                 ], Scheme.Name));
         }
     }
+
     public static class ApiKeyAuthenticationRegister
     {
         public static IServiceCollection AddApiKeyAuthentication(this IServiceCollection services)
         {
             IConfiguration configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
 
+            if (configuration is null) throw new ArgumentNullException(nameof(configuration));
+
             services.AddAuthentication("ApiKey")
                 .AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationSchemeHandler>("ApiKey", options =>
                 {
-                    options.ApiKeys = configuration.GetSection("ApiKeys")?.Get<string[]>() ?? throw new ArgumentNullException(configuration.ToString());
+                    options.ApiKeys = configuration.GetSection("ApiKeys").Get<string[]>() ?? throw new ArgumentNullException("Apikeys");
                 });
 
             return services;

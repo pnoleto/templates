@@ -17,7 +17,7 @@ namespace Infra.DI
 
             if(identity is null) return true;
 
-            return identity.IsAuthenticated || true;
+            return identity.IsAuthenticated;
         }
     }
 
@@ -26,23 +26,29 @@ namespace Infra.DI
         public static IServiceCollection AddScheduledJobs(this IServiceCollection services) => 
             services.AddTransient<FeedsJob>();
 
-        public static IServiceCollection AddRangFireSchedulerWithPostgreSql(this IServiceCollection services, string connectionString) => services
+        public static IServiceCollection AddHangFireSchedulerWithPostgreSql(this IServiceCollection services, string connectionString) => services
+            .AddHangfireServer()
+            .AddHangfire(hangFireOptions => hangFireOptions
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseColouredConsoleLogProvider()
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage((postgresOptions) =>
+                {
+                    IConfiguration configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+                    postgresOptions.UseNpgsqlConnection(configuration.GetConnectionString(connectionString));
+                }));
+
+        public static IServiceCollection AddHangFireSchedulerWithSqlServer(this IServiceCollection services, string connectionString) => services
             .AddHangfireServer()
             .AddHangfire(options => options
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                 .UseColouredConsoleLogProvider()
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage((cfg) =>
-                {
-                    ServiceProvider serviceProvider = services.BuildServiceProvider();
+                .UseSqlServerStorage(connectionString));
 
-                    cfg.UseNpgsqlConnection(serviceProvider
-                        .GetRequiredService<IConfiguration>()
-                        .GetConnectionString(connectionString));
-                }));
-
-        public static IServiceCollection AddRangFireSchedulerWithInMemoryDb(this IServiceCollection services) => services
+        public static IServiceCollection AddHangFireSchedulerWithInMemoryDb(this IServiceCollection services) => services
             .AddHangfireServer()
             .AddHangfire(options => options
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
