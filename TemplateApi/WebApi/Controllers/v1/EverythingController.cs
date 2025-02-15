@@ -3,6 +3,7 @@ using Application;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Application.DTO.Base;
 
 namespace WebApi.Controllers.v1
 {
@@ -19,7 +20,7 @@ namespace WebApi.Controllers.v1
             {
                 logger.LogInformation("requesting everything...");
 
-                var result = await mediator.Send(article);
+                ArticleResult result = await mediator.Send(article);
 
                 return new OkObjectResult(result);
             }

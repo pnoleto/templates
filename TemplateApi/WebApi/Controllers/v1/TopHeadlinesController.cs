@@ -3,6 +3,7 @@ using Application;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Application.DTO.Base;
 
 namespace WebApi.Controllers.v1
 {
@@ -19,7 +20,7 @@ namespace WebApi.Controllers.v1
             {
                 logger.LogInformation("requesting top-headlines...");
 
-                var result = await mediator.Send(sourceEvent);
+                ArticleResult result = await mediator.Send(sourceEvent);
 
                 return new OkObjectResult(result);
 
