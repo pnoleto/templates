@@ -1,9 +1,7 @@
-﻿using Domain.Models;
-
-namespace Infra.NewsRobot.Interfaces
+﻿namespace Infra.Robots.Interfaces
 {
-    public interface IRobot
+    public interface IRobot<T>
     {
-        Task<Source> ExecuteAsync(CancellationToken cancellationToken);
+        Task<T> ExecuteAsync(CancellationToken cancellationToken);
     }
 }

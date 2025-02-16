@@ -1,5 +1,4 @@
-﻿using Application.DTO;
-using Domain.Models;
+﻿using Domain.Models;
 using AutoMapper;
 
 namespace Application.Mapper.Profiles

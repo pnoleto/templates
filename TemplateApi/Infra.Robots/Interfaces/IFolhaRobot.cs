@@ -1,8 +1,8 @@
-﻿using Infra.NewsRobot.Interfaces;
+﻿using Domain.Models;
 
 namespace Infra.Robots.Interfaces
 {
-    public interface IFolhaRobot: IRobot
+    public interface IFolhaRobot: IRobot<Source>
     {
     }
 }

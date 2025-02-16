@@ -2,7 +2,7 @@
 
 namespace Infra.DI
 {
-    public static class CorsRegister
+    public static class CorsExtension
     {
         public static IServiceCollection AddCorsDefinitions(this IServiceCollection services) =>
             services.AddCors(cors =>

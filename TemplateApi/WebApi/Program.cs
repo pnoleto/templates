@@ -1,4 +1,5 @@
 using Infra.DI;
+using System.Reflection;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +8,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer()
      .AddHangFireSchedulerWithInMemoryDb()
      .AddOpenTelemetryInstrumentation()
-     .AddSwaggerDefinitions()
+     .AddApiKeyAuthentication()
+     .AddSwaggerDefinitions(Assembly.GetExecutingAssembly().GetName().Name)
      .AddInMemoryDbContext()
      .AddCorsDefinitions()
      .AddScheduledJobs()
@@ -21,10 +23,10 @@ WebApplication app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) app.UseSwaggerUIDefinitions();
 
-app.UseProtectedHangFireDashboard()
-    .UseHttpsRedirection()
+app.UseHttpsRedirection()
     .UseAuthentication()
     .UseAuthorization()
+    .UseProtectedHangFireDashboard()
     .UseScheduledJobs()
     .UseCors();
 

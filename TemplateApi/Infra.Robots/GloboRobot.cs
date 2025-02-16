@@ -9,7 +9,6 @@ namespace Infra.Robots
         {
             throw new NotImplementedException();
         }
-
   
     }
 }

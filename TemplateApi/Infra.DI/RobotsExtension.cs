@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Infra.DI
 {
-    public static class RobotsRegister
+    public static class RobotsExtension
     {
         public static IServiceCollection AddFeedRobots(this IServiceCollection services) => services
             .AddTransient<IFolhaRobot,FolhaRobot>()

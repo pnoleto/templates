@@ -2,15 +2,8 @@
 
 namespace Infra.Database.Seeds
 {
-    internal class ArticleSeeds : Migration
+    internal class ArticleSeed : Migration
     {
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable("Sources");
-
-            base.Down(migrationBuilder);
-        }
-
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.InsertData(
@@ -23,6 +16,11 @@ namespace Infra.Database.Seeds
                     true
                 ]
             );
+        }
+
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable("Sources");
         }
     }
 }

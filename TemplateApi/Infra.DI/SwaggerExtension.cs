@@ -3,19 +3,19 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 
 namespace Infra.DI
 {
-    public static class SwaggerRegister
+    public static class SwaggerExtension
     {
-        public static IServiceCollection AddSwaggerDefinitions(this IServiceCollection services)
+        public static IServiceCollection AddSwaggerDefinitions(this IServiceCollection services, string? xmlDocumentName)
         {
-            return services.AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions()
-                .AddApiExplorerWithVersioning()
-                .AddApiKeyAuthentication();
+            return services.AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions(xmlDocumentName)
+                .AddApiExplorerWithVersioning();
         }
 
-        private static IServiceCollection AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions(this IServiceCollection services)
+        private static IServiceCollection AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions(this IServiceCollection services, string? xmlDocumentName)
         {
             return services.AddSwaggerGen(options =>
             {
@@ -27,7 +27,21 @@ namespace Infra.DI
                         .AddApiKeySecurityDefinition()
                         .AddApiKeySecurityRequirement();
                 }
+
+                options.LoadXmlDocument(xmlDocumentName);
             });
+        }
+
+        private static SwaggerGenOptions LoadXmlDocument(this SwaggerGenOptions options, string? xmlDocumentName)
+        {
+            if (string.IsNullOrEmpty(xmlDocumentName)) return options;
+
+            string xmlFile = $"{new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName}/{xmlDocumentName}.xml";
+            string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            
+            options.IncludeXmlComments(xmlPath);
+
+            return options;
         }
 
         private static SwaggerGenOptions AddSwaggerDocument(this SwaggerGenOptions options, ApiVersionDescription item)

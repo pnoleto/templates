@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Infra.DI
 {
-    public static class RepositoriesRegister
+    public static class RepositoriesExtension
     {
         public static IServiceCollection AddRepositories(this IServiceCollection services) => services
             .AddTransient(typeof(ISelectRepositoryBase<>), typeof(SelectRepositoryBase<>))

@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Security.Claims;
 using System.Text.Encodings.Web;
+using System.Security.Claims;
 
 namespace Infra.DI
 {
@@ -26,22 +26,24 @@ namespace Infra.DI
 
             if (!Options.ApiKeys.Contains(apikey)) return Task.FromResult(AuthenticateResult.Fail("Invalid x-api-key"));
 
-            AuthenticationTicket ticket = new(UserIdentity(), Scheme.Name);
+            bool isAdmin = apikey == "ApiKey1";
+
+            AuthenticationTicket ticket = new(UserIdentity(isAdmin), Scheme.Name);
 
             return Task.FromResult(AuthenticateResult.Success(ticket));
         }
 
-        private ClaimsPrincipal UserIdentity()
+        private ClaimsPrincipal UserIdentity(bool isAdmin = false)
         {
             return new(new ClaimsIdentity([
                     new(ClaimTypes.Sid, Guid.NewGuid().ToString()),
-                    new(ClaimTypes.Role, "User"),
+                    new(ClaimTypes.Role, isAdmin? "Admin": "User"),
                     new(ClaimTypes.Expiration, DateTime.Now.AddDays(10).ToString("s"))
                 ], Scheme.Name));
         }
     }
 
-    public static class ApiKeyAuthenticationRegister
+    public static class ApiKeyAuthenticationExtension
     {
         public static IServiceCollection AddApiKeyAuthentication(this IServiceCollection services)
         {
@@ -49,10 +51,17 @@ namespace Infra.DI
 
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));
 
-            services.AddAuthentication("ApiKey")
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ApiKey", policy =>
+                {
+                    policy.AddAuthenticationSchemes("ApiKey")
+                    .RequireAuthenticatedUser();
+                });
+            }).AddAuthentication("ApiKey")
                 .AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationSchemeHandler>("ApiKey", options =>
                 {
-                    options.ApiKeys = configuration.GetSection("ApiKeys").Get<string[]>() ?? throw new ArgumentNullException("Apikeys");
+                    options.ApiKeys = configuration?.GetSection("ApiKeys")?.Get<string[]>() ?? [];
                 });
 
             return services;

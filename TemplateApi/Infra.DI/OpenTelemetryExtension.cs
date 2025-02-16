@@ -9,7 +9,7 @@ using OpenTelemetry.Trace;
 
 namespace Infra.DI
 {
-    public static class OpenTelemetryRegister
+    public static class OpenTelemetryExtension
     {
         public static IServiceCollection AddOpenTelemetryInstrumentation(this IServiceCollection services)
         {
