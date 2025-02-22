@@ -2,6 +2,8 @@
 
 namespace Infra.Database.Migrations
 {
+
+    [Migration("AddNewCollumnOn")]
     internal class AddColumnXSeed : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

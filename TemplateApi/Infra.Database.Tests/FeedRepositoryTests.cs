@@ -1,8 +1,8 @@
-﻿using Domain.Interfaces.Repositories;
-using Domain.Models;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Domain.Interfaces.Repositories;
 using Infra.Database.ModelDbContext;
-using Infra.Database.Repositories;
-using Microsoft.EntityFrameworkCore;
+using Domain.Models;
+using Infra.DI;
 
 namespace Infra.Database.Tests
 {
@@ -12,44 +12,42 @@ namespace Infra.Database.Tests
         private readonly NewsDbContext _context;
         public FeedRepositoryTests()
         {
-            var options = new DbContextOptionsBuilder<NewsDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
+            ServiceProvider provider = new ServiceCollection()
+            .AddInMemoryDbContext()
+            .AddRepositories()
+            .BuildServiceProvider();
 
-            _context = new NewsDbContext(options);
+            _context = provider.GetRequiredService<NewsDbContext>();
 
-            _feedRepository = new FeedRepository(_context);
+            _feedRepository = provider.GetRequiredService<IFeedRepository>();
         }
 
         [SetUp]
         public void SetUp()
         {
-            _context.Database.EnsureDeleted();
-            _context.Database.EnsureCreated();
+
         }
 
-        [Test]
+        [Test, Order(1)]
         public void EnsureRepositoryBaseToBeDefined()
         {
             Assert.That(_feedRepository, Is.Not.Null);
         }
 
-        [Test]
+        [Test, Order(2)]
         public void EnsureFeedToBeInserted()
         {
             AddEntity();
 
-            var entity = _feedRepository.Get(y=> y != null).Any();
+            var entity = _feedRepository.Get(y=> true).Any();
 
             Assert.That(entity, Is.True);
         }
 
-        [Test]
+        [Test, Order(3)]
         public void EnsureFeedToBeUpdated()
         {
-            AddEntity();
-
-            var entity = _feedRepository.Get(y => y != null).First();
+            var entity = _feedRepository.Get(y => y.Active == false).First();
 
             entity.Active = true;
 
@@ -60,16 +58,14 @@ namespace Infra.Database.Tests
             Assert.That(entityExists, Is.True);
         }
 
-        [Test]
+        [Test, Order(4)]
         public void EnsureFeedToBeDeleted()
         {
-            AddEntity();
-
-            var entity = _feedRepository.Get(y => y.Active == false).Single();
+            var entity = _feedRepository.Get(y => y.Active == true).Single();
 
             _feedRepository.Delete(entity);
 
-            var entityExists = _feedRepository.Get(y => y.Active == false).Any();
+            var entityExists = _feedRepository.Get(y => true).Any();
 
             Assert.That(entityExists, Is.False);
         }

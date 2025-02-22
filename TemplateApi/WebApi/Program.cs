@@ -20,7 +20,6 @@ builder.Services.AddEndpointsApiExplorer()
 
 WebApplication app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) app.UseSwaggerUIDefinitions();
 
 app.UseHttpsRedirection()

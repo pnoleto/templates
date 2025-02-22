@@ -1,8 +1,8 @@
-﻿using Domain.Interfaces.Repositories;
-using Domain.Models;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Domain.Interfaces.Repositories;
 using Infra.Database.ModelDbContext;
-using Infra.Database.Repositories;
-using Microsoft.EntityFrameworkCore;
+using Domain.Models;
+using Infra.DI;
 
 namespace Infra.Database.Tests
 {
@@ -12,44 +12,42 @@ namespace Infra.Database.Tests
         private readonly NewsDbContext _context;
         public ArticleRepositoryTests()
         {
-            var options = new DbContextOptionsBuilder<NewsDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
+            ServiceProvider provider = new ServiceCollection()
+            .AddInMemoryDbContext()
+            .AddRepositories()
+            .BuildServiceProvider();
 
-            _context = new NewsDbContext(options);
+            _context = provider.GetRequiredService<NewsDbContext>();
 
-            _articleRepository = new ArticleRepository(_context);
+            _articleRepository = provider.GetRequiredService<IArticleRepository>(); 
         }
 
         [SetUp]
         public void SetUp()
         {
-            _context.Database.EnsureDeleted();
-            _context.Database.EnsureCreated();
+
         }
 
-        [Test]
+        [Test, Order(1)]
         public void EnsureRepositoryBaseToBeDefined()
         {
             Assert.That(_articleRepository, Is.Not.Null);
         }
 
-        [Test]
+        [Test, Order(2)]
         public void EnsureArticleToBeInserted()
         {
             AddEntity();
 
-            var entity = _articleRepository.Get(y=> y != null).Any();
+            var entity = _articleRepository.Get(y=> true).Any();
 
             Assert.That(entity, Is.True);
         }
 
-        [Test]
+        [Test, Order(3)]
         public void EnsureArticleToBeUpdated()
         {
-            AddEntity();
-
-            var entity = _articleRepository.Get(y => y != null).First();
+            var entity = _articleRepository.Get(y => true).First();
 
             entity.Active = true;
 
@@ -60,16 +58,14 @@ namespace Infra.Database.Tests
             Assert.That(entityExists, Is.True);
         }
 
-        [Test]
+        [Test, Order(4)]
         public void EnsureArticleToBeDeleted()
         {
-            AddEntity();
-
-            var entity = _articleRepository.Get(y => y.Active == false).Single();
+            var entity = _articleRepository.Get(y => y.Active == true).Single();
 
             _articleRepository.Delete(entity);
 
-            var entityExists = _articleRepository.Get(y => y.Active == false).Any();
+            var entityExists = _articleRepository.Get(y => true).Any();
 
             Assert.That(entityExists, Is.False);
         }

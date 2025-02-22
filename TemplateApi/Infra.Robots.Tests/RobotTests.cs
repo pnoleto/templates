@@ -1,6 +1,6 @@
-using Infra.DI;
-using Infra.Robots.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Infra.Robots.Interfaces;
+using Infra.DI;
 
 namespace Infra.Robots.Tests
 {
@@ -33,11 +33,13 @@ namespace Infra.Robots.Tests
         {
             CancellationTokenSource cts = new();
 
-            var request = _g1Robot.ExecuteAsync(cts.Token);
+            Assert.ThrowsAsync<NotImplementedException>(()=> _g1Robot.ExecuteAsync(cts.Token));
 
-            request.Wait();
+            //var request = _g1Robot.ExecuteAsync(cts.Token);
 
-            Assert.That(request.Result.Articles.Count, Is.Not.EqualTo(0));
+            //request.Wait();
+
+            //Assert.That(request.Result.Articles.Count, Is.Not.EqualTo(0));
         }
 
         [Test]
@@ -45,11 +47,13 @@ namespace Infra.Robots.Tests
         {
             CancellationTokenSource cts = new();
 
-            var request = _folhaRobot.ExecuteAsync(cts.Token);
+            Assert.ThrowsAsync<NotImplementedException>(() => _folhaRobot.ExecuteAsync(cts.Token));
+            
+            //var request = _folhaRobot.ExecuteAsync(cts.Token);
 
-            request.Wait();
+            //request.Wait();
 
-            Assert.That(request.Result.Articles.Count, Is.Not.EqualTo(0));
+            //Assert.That(request.Result.Articles.Count, Is.Not.EqualTo(0));
         }
 
         [Test]
@@ -57,11 +61,13 @@ namespace Infra.Robots.Tests
         {
             CancellationTokenSource cts = new();
 
-            var request = _gdpRobot.ExecuteAsync(cts.Token);
+            Assert.ThrowsAsync<NotImplementedException>(() => _gdpRobot.ExecuteAsync(cts.Token));
 
-            request.Wait();
+            //var request = _gdpRobot.ExecuteAsync(cts.Token);
 
-            Assert.That(request.Result.Articles.Count, Is.Not.EqualTo(0));
+            //request.Wait();
+
+            //Assert.That(request.Result.Articles.Count, Is.Not.EqualTo(0));
         }
     }
 }

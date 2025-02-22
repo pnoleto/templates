@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Infra.Database\Infra.Database.csproj" />
+    <ProjectReference Include="..\Infra.DI\Infra.DI.csproj" />
   </ItemGroup>
 
 </Project>

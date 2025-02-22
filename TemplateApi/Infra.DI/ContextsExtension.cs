@@ -12,9 +12,11 @@ namespace Infra.DI
 
         public static IServiceCollection AddSqlServerDbContext(this IServiceCollection services, string connectionStringName)
         {
-            IConfiguration configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+            IConfiguration configuration = services.BuildServiceProvider()
+                .GetRequiredService<IConfiguration>();
 
-            services.AddDbContext<NewsDbContext>(cfg => cfg.UseSqlServer(configuration.GetConnectionString(connectionStringName),
+            services.AddDbContext<NewsDbContext>(cfg => cfg.UseSqlServer(configuration
+                .GetConnectionString(connectionStringName),
                 builder =>
                     builder.CommandTimeout(THIRTY_SECONDS)
                     .EnableRetryOnFailure(THREE_RETRIES, TimeSpan.FromSeconds(THIRTY_SECONDS), null)
@@ -26,9 +28,11 @@ namespace Infra.DI
 
         public static IServiceCollection AddPostgresDbContext(this IServiceCollection services, string connectionStringName)
         {
-            IConfiguration configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+            IConfiguration configuration = services.BuildServiceProvider()
+                .GetRequiredService<IConfiguration>();
 
-            services.AddDbContext<NewsDbContext>(cfg => cfg.UseNpgsql(configuration.GetConnectionString(connectionStringName),
+            services.AddDbContext<NewsDbContext>(cfg => cfg.UseNpgsql(configuration
+                .GetConnectionString(connectionStringName),
                 builder =>
                     builder.CommandTimeout(THIRTY_SECONDS)
                     .EnableRetryOnFailure(THREE_RETRIES, TimeSpan.FromSeconds(THIRTY_SECONDS), null)
@@ -38,6 +42,6 @@ namespace Infra.DI
             return services;
         }
         public static IServiceCollection AddInMemoryDbContext(this IServiceCollection services) =>
-            services.AddDbContext<NewsDbContext>(cfg => cfg.UseInMemoryDatabase("default"));
+            services.AddDbContext<NewsDbContext>(cfg => cfg.UseInMemoryDatabase(Guid.NewGuid().ToString()));
     }
 }

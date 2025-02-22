@@ -38,8 +38,11 @@ namespace Infra.DI
                 .UseRecommendedSerializerSettings()
                 .UsePostgreSqlStorage((postgresOptions) =>
                 {
-                    IConfiguration configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
-                    postgresOptions.UseNpgsqlConnection(configuration.GetConnectionString(connectionString));
+                    IConfiguration configuration = services.BuildServiceProvider()
+                    .GetRequiredService<IConfiguration>();
+
+                    postgresOptions.UseNpgsqlConnection(configuration
+                        .GetConnectionString(connectionString));
                 }));
 
         public static IServiceCollection AddHangFireSchedulerWithSqlServer(this IServiceCollection services, string connectionString) => services
@@ -71,14 +74,17 @@ namespace Infra.DI
 
         public static IApplicationBuilder UseScheduledJobs(this IApplicationBuilder app)
         {
-            IRecurringJobManager recurringJobManager = app.ApplicationServices.GetRequiredService<IRecurringJobManager>();
+            IRecurringJobManager recurringJobManager = app.ApplicationServices
+                .GetRequiredService<IRecurringJobManager>();
 
-            IBackgroundJobClient backgroundJobFactory = app.ApplicationServices.GetRequiredService<IBackgroundJobClient>();
+            IBackgroundJobClient backgroundJobFactory = app.ApplicationServices
+                .GetRequiredService<IBackgroundJobClient>();
 
             recurringJobManager.AddOrUpdate<FeedsJob>(nameof(FeedsJob.ExecuteAsync), (feedsJob) => feedsJob
                 .ExecuteAsync(new CancellationTokenSource().Token), Cron.Daily(11, 00));
 
-            backgroundJobFactory.Enqueue<MigrationsJob>(nameof(MigrationsJob.ExecuteAsync).ToLowerInvariant(), (feedsJob) => feedsJob
+            backgroundJobFactory.Enqueue<MigrationsJob>(nameof(MigrationsJob.ExecuteAsync)
+                .ToLowerInvariant(), (feedsJob) => feedsJob
                 .ExecuteAsync(new CancellationTokenSource().Token));
 
             return app;

@@ -1,8 +1,8 @@
 ﻿using Domain.Interfaces.Repositories;
 using Domain.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Infra.Database.ModelDbContext;
-using Infra.Database.Repositories;
-using Microsoft.EntityFrameworkCore;
+using Infra.DI;
 
 namespace Infra.Database.Tests
 {
@@ -12,29 +12,28 @@ namespace Infra.Database.Tests
         private readonly NewsDbContext _context;
         public SourceRepositoryTests()
         {
-            var options = new DbContextOptionsBuilder<NewsDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
+            ServiceProvider provider = new ServiceCollection()
+                .AddInMemoryDbContext()
+                .AddRepositories()
+                .BuildServiceProvider();
 
-            _context = new NewsDbContext(options);
-
-            _sourceRepository = new SourceRepository(_context);
+            _context = provider.GetRequiredService<NewsDbContext>();
+            _sourceRepository = provider.GetRequiredService<ISourceRepository>();
         }
 
         [SetUp]
         public void SetUp()
         {
-            _context.Database.EnsureDeleted();
-            _context.Database.EnsureCreated();
+
         }
 
-        [Test]
+        [Test, Order(1)]
         public void EnsureRepositoryBaseToBeDefined()
         {
             Assert.That(_sourceRepository, Is.Not.Null);
         }
 
-        [Test]
+        [Test, Order(2)]
         public void EnsureSourceToBeInserted()
         {
             AddEntity();
@@ -44,32 +43,28 @@ namespace Infra.Database.Tests
             Assert.That(entity, Is.True);
         }
 
-        [Test]
+        [Test, Order(3)]
         public void EnsureSourceToBeUpdated()
         {
-            AddEntity();
-
-            var entity = _sourceRepository.Get(y => true).First();
+            Source entity = _sourceRepository.Get(y => y.Active == false).First();
 
             entity.Active = true;
 
             _sourceRepository.Update(entity);
 
-            var entityExists = _sourceRepository.Get(y => y.Active == true).Any();
+            bool entityExists = _sourceRepository.Get(y => y.Active == true).Any();
 
             Assert.That(entityExists, Is.True);
         }
 
-        [Test]
+        [Test, Order(4)]
         public void EnsureSourceToBeDeleted()
         {
-            AddEntity();
-
-            var entity = _sourceRepository.Get(y => y.Active == false).Single();
+            Source entity = _sourceRepository.Get(y => y.Active == true).Single();
 
             _sourceRepository.Delete(entity);
 
-            var entityExists = _sourceRepository.Get(y => y.Active == false).Any();
+            bool entityExists = _sourceRepository.Get(y => true).Any();
 
             Assert.That(entityExists, Is.False);
         }

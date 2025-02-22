@@ -21,6 +21,11 @@ namespace WebApi.Controllers.v1
      Route("api/v{version:apiVersion}/[controller]"), ControllerName("top-headlines")]
     public class TopHeadlinesController(IMediator mediator, ILogger<SourceController> logger) : ControllerBase
     {
+        /// <summary>
+        /// GEt Top headlines
+        /// </summary>
+        /// <param name="sourceEvent"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetAsync([FromQuery] TopHeadlinesEvent sourceEvent)
         {

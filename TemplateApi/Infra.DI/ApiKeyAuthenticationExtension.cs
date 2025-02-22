@@ -47,7 +47,8 @@ namespace Infra.DI
     {
         public static IServiceCollection AddApiKeyAuthentication(this IServiceCollection services)
         {
-            IConfiguration configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+            IConfiguration configuration = services.BuildServiceProvider()
+                .GetRequiredService<IConfiguration>();
 
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));
 

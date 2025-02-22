@@ -13,13 +13,13 @@ namespace Infra.DI
     {
         public static IServiceCollection AddOpenTelemetryInstrumentation(this IServiceCollection services)
         {
-            IConfiguration configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+            IConfiguration configuration = services.BuildServiceProvider()
+                .GetRequiredService<IConfiguration>();
 
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
             services.AddOpenTelemetry()
-              .ConfigureResource(resource => resource
-                .AddService(
+              .ConfigureResource(resource => resource.AddService(
                       serviceName: configuration.GetValue("Instrumentation:ServiceName", string.Empty), 
                       serviceVersion: configuration.GetValue("Instrumentation:ServiceVersion", string.Empty))
                  .AddAttributes(
@@ -43,8 +43,10 @@ namespace Infra.DI
             builder.Logging.AddOpenTelemetry(options => options.SetResourceBuilder(ResourceBuilder
                 .CreateDefault()
                 .AddService(
-                    serviceName: builder.Configuration.GetValue("Instrumentation:ServiceName", string.Empty),
-                    serviceVersion: builder.Configuration.GetValue("Instrumentation:ServiceVersion", string.Empty)))
+                    serviceName: builder.Configuration
+                    .GetValue("Instrumentation:ServiceName", string.Empty),
+                    serviceVersion: builder.Configuration
+                    .GetValue("Instrumentation:ServiceVersion", string.Empty)))
             .AddConsoleExporter()
             .AddOtlpExporter(cfg => cfg.Endpoint = new Uri(builder.Configuration.GetValue("Instrumentation:Uri", string.Empty))));
 

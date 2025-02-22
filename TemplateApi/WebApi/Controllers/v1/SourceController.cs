@@ -21,6 +21,11 @@ namespace WebApi.Controllers.v1
      Route("api/v{version:apiVersion}/[controller]"), ControllerName("sources")]
     public class SourceController(IMediator mediator, ILogger<SourceController> logger) : ControllerBase
     {
+        /// <summary>
+        /// Get Sources
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] SourceEvent source)
         {

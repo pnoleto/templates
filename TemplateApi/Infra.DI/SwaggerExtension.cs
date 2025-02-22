@@ -9,35 +9,37 @@ namespace Infra.DI
 {
     public static class SwaggerExtension
     {
-        public static IServiceCollection AddSwaggerDefinitions(this IServiceCollection services, string? xmlDocumentName)
+        public static IServiceCollection AddSwaggerDefinitions(this IServiceCollection services, string? xmlDocumentName, bool addApiKeyDefinitions = false)
         {
-            return services.AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions(xmlDocumentName)
+            return services.AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions(xmlDocumentName, addApiKeyDefinitions)
                 .AddApiExplorerWithVersioning();
         }
-
-        private static IServiceCollection AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions(this IServiceCollection services, string? xmlDocumentName)
+        private static IServiceCollection AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions(this IServiceCollection services, string? xmlDocumentName, bool addApiKeyDefinitions = false)
         {
             return services.AddSwaggerGen(options =>
             {
-                IApiVersionDescriptionProvider? provider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
+                IApiVersionDescriptionProvider? provider = services.BuildServiceProvider()
+                .GetRequiredService<IApiVersionDescriptionProvider>();
 
                 foreach (ApiVersionDescription apiVersion in provider.ApiVersionDescriptions)
                 {
-                    options.AddSwaggerDocument(apiVersion)
-                        .AddApiKeySecurityDefinition()
+                    options.AddSwaggerDocument(apiVersion);
+
+                    if (addApiKeyDefinitions)
+                        options.AddApiKeySecurityDefinition()
                         .AddApiKeySecurityRequirement();
                 }
 
-                options.LoadXmlDocument(xmlDocumentName);
+                if (!string.IsNullOrEmpty(xmlDocumentName))
+                    options.LoadXmlDocument(xmlDocumentName);
             });
         }
 
         private static SwaggerGenOptions LoadXmlDocument(this SwaggerGenOptions options, string? xmlDocumentName)
         {
-            if (string.IsNullOrEmpty(xmlDocumentName)) return options;
+            string xmlExtension = ".xml";
 
-            string xmlFile = $"{new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName}/{xmlDocumentName}.xml";
-            string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            string xmlPath = $"{new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName}/{xmlDocumentName}{xmlExtension}";
             
             options.IncludeXmlComments(xmlPath);
 
@@ -109,9 +111,9 @@ namespace Infra.DI
             builder.UseSwagger()
                 .UseSwaggerUI(options =>
                 {
-                    var provider = builder.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
+                    IApiVersionDescriptionProvider provider = builder.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
 
-                    foreach (var item in provider.ApiVersionDescriptions)
+                    foreach (ApiVersionDescription item in provider.ApiVersionDescriptions)
                     {
                         options.SwaggerEndpoint($"/swagger/{item.GroupName}/swagger.json", item.GroupName.ToUpperInvariant());
                     }
