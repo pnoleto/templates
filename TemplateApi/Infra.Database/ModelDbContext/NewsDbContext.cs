@@ -11,10 +11,9 @@ namespace Infra.Database.ModelDbContext
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder
-                .EnableDetailedErrors()
+            optionsBuilder.EnableDetailedErrors()
                 .EnableSensitiveDataLogging();
-            
+
             base.OnConfiguring(optionsBuilder);
         }
 

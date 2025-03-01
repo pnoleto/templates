@@ -1,7 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Infra.Migrations.ModelDbContext;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Infra.Database.Seeds
+namespace Infra.Migrations.Seeds
 {
+    [DbContext(typeof(MigrationsDbContext)),
+        Migration("20250301181243_Seed_Sources")]
     internal class ArticleSeed : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

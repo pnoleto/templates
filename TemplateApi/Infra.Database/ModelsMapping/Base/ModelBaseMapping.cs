@@ -1,5 +1,6 @@
 ﻿using Domain.Models.Base;
 using Microsoft.EntityFrameworkCore;
+using Infra.Database.ModelsMapping.Generators;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infra.Database.ModelsMapping.Base
@@ -8,13 +9,22 @@ namespace Infra.Database.ModelsMapping.Base
     {
         public override void Configure(EntityTypeBuilder<T> builder)
         {
-            builder.HasKey(x => x.Id);
-            builder.Property(x => x.Id).IsRequired();
-            builder.Property(entity => entity.CreatedAt).HasDefaultValue(DateTime.Now).IsRequired();
-            builder.Property(entity => entity.UpdatedAt).HasDefaultValue(DateTime.Now).IsRequired();
-            builder.Property(entity => entity.DeletedAt).HasDefaultValue(null);
-            builder.Property(entity => entity.Active).HasDefaultValue(true).IsRequired();
-
+            builder.HasKey(entity => entity.Id);
+            builder.Property(entity => entity.Id)
+                .IsRequired();
+            builder.Property(entity => entity.CreatedAt)
+                .HasValueGenerator<DateTimeGenerator>()
+                .ValueGeneratedOnAdd()
+                .IsRequired();
+            builder.Property(entity => entity.UpdatedAt)
+                .HasValueGenerator<DateTimeGenerator>()
+                .ValueGeneratedOnAddOrUpdate()
+                .IsRequired();
+            builder.Property(entity => entity.DeletedAt);
+            builder.Property(entity => entity.Active)
+                .HasDefaultValue(true)
+                .IsRequired();
+            builder.HasQueryFilter(entity => !entity.DeletedAt.HasValue && entity.Active);
         }
     }
 }

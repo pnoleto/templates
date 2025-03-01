@@ -4,7 +4,6 @@ using Hangfire.PostgreSql;
 using Infra.RecurringJobs;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infra.DI
@@ -25,52 +24,41 @@ namespace Infra.DI
 
     public static class HangFireRegisterExtension
     {
-        public static IServiceCollection AddScheduledJobs(this IServiceCollection services) => services
-            .AddTransient<FeedsJob>()
-            .AddTransient<MigrationsJob>();
+        private static IGlobalConfiguration SetHangFireDefaultConfigs(this IGlobalConfiguration hangFireOptions)
+        {
+            return hangFireOptions.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                            .UseColouredConsoleLogProvider()
+                            .UseSimpleAssemblyNameTypeSerializer()
+                            .UseRecommendedSerializerSettings();
+        }
 
         public static IServiceCollection AddHangFireSchedulerWithPostgreSql(this IServiceCollection services, string connectionString) => services
             .AddHangfireServer()
-            .AddHangfire(hangFireOptions => hangFireOptions
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                .UseColouredConsoleLogProvider()
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage((postgresOptions) =>
-                {
-                    IConfiguration configuration = services.BuildServiceProvider()
-                    .GetRequiredService<IConfiguration>();
-
-                    postgresOptions.UseNpgsqlConnection(configuration
-                        .GetConnectionString(connectionString));
-                }));
+            .AddHangfire(options => options.SetHangFireDefaultConfigs()
+                .UsePostgreSqlStorage(pgOptions => pgOptions.UseNpgsqlConnection(connectionString)));
 
         public static IServiceCollection AddHangFireSchedulerWithSqlServer(this IServiceCollection services, string connectionString) => services
             .AddHangfireServer()
-            .AddHangfire(options => options
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                .UseColouredConsoleLogProvider()
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
+            .AddHangfire(options => options.SetHangFireDefaultConfigs()
                 .UseSqlServerStorage(connectionString));
 
         public static IServiceCollection AddHangFireSchedulerWithInMemoryDb(this IServiceCollection services) => services
             .AddHangfireServer()
-            .AddHangfire(options => options
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                .UseColouredConsoleLogProvider()
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
+            .AddHangfire(options => options.SetHangFireDefaultConfigs()
                 .UseInMemoryStorage());
 
-        public static IApplicationBuilder UseProtectedHangFireDashboard(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseProtectedHangFireDashboard(this IApplicationBuilder builder, string hangFireEndpoint = "/hangfire/dashboard")
         {
-            return builder.UseHangfireDashboard("/hangfire/dashboard",
+            return builder.UseHangfireDashboard(hangFireEndpoint,
                 options: new DashboardOptions
                 {
                     Authorization = [new HangRireAuthorizationFilter()]
                 });
         }
+
+        public static IServiceCollection AddScheduledJobs(this IServiceCollection services) => services
+            .AddTransient<FeedsJob>()
+            .AddTransient<MigrationsJob>();
 
         public static IApplicationBuilder UseScheduledJobs(this IApplicationBuilder app)
         {
@@ -80,11 +68,10 @@ namespace Infra.DI
             IBackgroundJobClient backgroundJobFactory = app.ApplicationServices
                 .GetRequiredService<IBackgroundJobClient>();
 
-            recurringJobManager.AddOrUpdate<FeedsJob>(nameof(FeedsJob.ExecuteAsync), (feedsJob) => feedsJob
+            recurringJobManager.AddOrUpdate<FeedsJob>(nameof(FeedsJob), recurringJob => recurringJob
                 .ExecuteAsync(new CancellationTokenSource().Token), Cron.Daily(11, 00));
 
-            backgroundJobFactory.Enqueue<MigrationsJob>(nameof(MigrationsJob.ExecuteAsync)
-                .ToLowerInvariant(), (feedsJob) => feedsJob
+            backgroundJobFactory.Enqueue<MigrationsJob>(nameof(MigrationsJob).ToLower(), recurringJob => recurringJob
                 .ExecuteAsync(new CancellationTokenSource().Token));
 
             return app;

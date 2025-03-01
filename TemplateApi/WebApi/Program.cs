@@ -8,10 +8,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer()
      .AddHangFireSchedulerWithInMemoryDb()
      .AddOpenTelemetryInstrumentation()
+     .ExecuteMigrationOnStartup("LocaDb")
      .AddApiKeyAuthentication()
-     .AddSwaggerDefinitions(Assembly.GetExecutingAssembly().GetName().Name)
-     .AddInMemoryDbContext()
+     .AddSwaggerDefinitions(
+        xmlDocumentName: Assembly.GetExecutingAssembly().GetName().Name, 
+        addApiKeyDefinitions: true
+     ).AddInMemoryDbContext()
+     .AddExceptionHandler()
      .AddCorsDefinitions()
+     .AddProblemDetails()
      .AddScheduledJobs()
      .AddRepositories()
      .AddFeedRobots()
@@ -20,7 +25,10 @@ builder.Services.AddEndpointsApiExplorer()
 
 WebApplication app = builder.Build();
 
-if (app.Environment.IsDevelopment()) app.UseSwaggerUIDefinitions();
+if (app.Environment.IsDevelopment())
+    app.UseSwaggerUIDefinitions()
+        .UseExceptionHandler("/Error")
+        .UseDeveloperExceptionPage();
 
 app.UseHttpsRedirection()
     .UseAuthentication()

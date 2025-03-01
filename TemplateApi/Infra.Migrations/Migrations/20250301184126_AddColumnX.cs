@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Infra.Migrations.ModelDbContext;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Infra.Database.Migrations
+namespace Infra.Migrations.Migrations
 {
-
-    [Migration("AddNewCollumnOn")]
-    internal class AddColumnXSeed : Migration
+    [DbContext(typeof(MigrationsDbContext)),
+        Migration("20250301181243_AddColumnX")]
+    internal class AddColumnX : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
