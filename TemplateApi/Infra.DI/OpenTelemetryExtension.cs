@@ -16,7 +16,7 @@ namespace Infra.DI
             IConfiguration configuration = services.BuildServiceProvider()
                 .GetRequiredService<IConfiguration>();
 
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+            ArgumentNullException.ThrowIfNull(configuration);
 
             services.AddOpenTelemetry()
               .ConfigureResource(resource => resource.AddService(

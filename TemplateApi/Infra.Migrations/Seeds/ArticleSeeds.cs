@@ -13,18 +13,13 @@ namespace Infra.Migrations.Seeds
             migrationBuilder.InsertData(
                 table: "Sources",
                 columns: ["Name", "CreatedAt", "UpdateAt", "Active"],
-                values: [
-                    "Test",
-                    DateTime.Now.ToString(),
-                    DateTime.Now.ToString(),
-                    true
-                ]
+                values: ["Test", DateTime.Now.ToString(), DateTime.Now.ToString(), true]
             );
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable("Sources");
+            
         }
     }
 }

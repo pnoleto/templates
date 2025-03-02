@@ -16,9 +16,9 @@ namespace Application
 
                 if (!string.IsNullOrEmpty(request.Q)) query = query.Where(x => x.Title.Contains(request.Q) || x.Description.Contains(request.Q) || x.Content.Contains(request.Q));
 
-                if (!string.IsNullOrEmpty(request.Category)) query = query.Where(x => x.Source.Feeds.Where(y=> y.Category == request.Category.ToLower()).Any());
+                if (!string.IsNullOrEmpty(request.Category)) query = query.Where(x => x.Source.Feeds.Where(y=> string.Equals(y.Category, request.Category)).Any());
 
-                if (!string.IsNullOrEmpty(request.Country)) query = query.Where(x => x.Source.Feeds.Where(y => y.Country == request.Country.ToLower()).Any());
+                if (!string.IsNullOrEmpty(request.Country)) query = query.Where(x => x.Source.Feeds.Where(y => string.Equals(y.Country, request.Country)).Any());
 
                 if (!string.IsNullOrEmpty(request.Source)) query = query.Where(x => x.Source.Name.Contains(request.Source));
 

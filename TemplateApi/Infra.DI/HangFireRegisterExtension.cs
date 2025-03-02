@@ -57,8 +57,7 @@ namespace Infra.DI
         }
 
         public static IServiceCollection AddScheduledJobs(this IServiceCollection services) => services
-            .AddTransient<FeedsJob>()
-            .AddTransient<MigrationsJob>();
+            .AddTransient<FeedsJob>();
 
         public static IApplicationBuilder UseScheduledJobs(this IApplicationBuilder app)
         {
@@ -70,9 +69,6 @@ namespace Infra.DI
 
             recurringJobManager.AddOrUpdate<FeedsJob>(nameof(FeedsJob), recurringJob => recurringJob
                 .ExecuteAsync(new CancellationTokenSource().Token), Cron.Daily(11, 00));
-
-            backgroundJobFactory.Enqueue<MigrationsJob>(nameof(MigrationsJob).ToLower(), recurringJob => recurringJob
-                .ExecuteAsync(new CancellationTokenSource().Token));
 
             return app;
         }

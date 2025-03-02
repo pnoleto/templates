@@ -8,7 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer()
      .AddHangFireSchedulerWithInMemoryDb()
      .AddOpenTelemetryInstrumentation()
-     .ExecuteMigrationOnStartup("LocaDb")
+     //.ExecuteMigrationsOnStartup("LocaDb")
      .AddApiKeyAuthentication()
      .AddSwaggerDefinitions(
         xmlDocumentName: Assembly.GetExecutingAssembly().GetName().Name, 

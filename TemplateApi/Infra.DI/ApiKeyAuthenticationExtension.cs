@@ -50,7 +50,7 @@ namespace Infra.DI
             IConfiguration configuration = services.BuildServiceProvider()
                 .GetRequiredService<IConfiguration>();
 
-            if (configuration is null) throw new ArgumentNullException(nameof(configuration));
+            ArgumentNullException.ThrowIfNull(configuration);
 
             services.AddAuthorization(options =>
             {

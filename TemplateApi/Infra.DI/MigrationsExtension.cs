@@ -2,30 +2,38 @@
 using Infra.Migrations.ModelDbContext;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Infra.Migrations.Interfaces;
+using Infra.Migrations.Factories;
 
 namespace Infra.DI
 {
     public static class MigrationsExtension
     {
-        public static IServiceCollection ExecuteMigrationOnStartup(this IServiceCollection services, string connectionString)
+        public static IServiceCollection ExecuteMigrationsOnStartup(this IServiceCollection services, string connectionStringName)
         {
-            if (services is null) throw new ArgumentNullException(nameof(services));
+            ArgumentNullException.ThrowIfNull(services);
 
-            if (string.IsNullOrEmpty(connectionString)) throw new ArgumentNullException(nameof(connectionString)); 
+            ArgumentNullException.ThrowIfNull(connectionStringName); 
 
-            services.AddSingleton<MigrationsDbFactory>();
+            services.AddSingleton<IMigrationsDbContextFactory, MigrationsDbContextFactory>();
 
             ServiceProvider serviceProvider = services.BuildServiceProvider();
 
             using (IServiceScope serviceScope = serviceProvider.CreateScope())
             {
+                string? connectionString = string.Empty;
+
                 IConfiguration configuration = serviceProvider.GetRequiredService<IConfiguration>();
+                
+                connectionString = configuration.GetConnectionString(connectionStringName);
 
-                MigrationsDbFactory context = serviceProvider.GetRequiredService<MigrationsDbFactory>();
+                ArgumentNullException.ThrowIfNull(connectionString);
 
-                MigrationsDbContext connection = context.CreateDbContext(configuration.GetConnectionString(connectionString));
+                IMigrationsDbContextFactory context = serviceProvider.GetRequiredService<IMigrationsDbContextFactory>();
 
-                var migrations = connection.Database.GetPendingMigrations().ToList();
+                MigrationsDbContext connection = context.CreateDbContext(connectionString);
+
+                IList<string> migrations = [..connection.Database.GetPendingMigrations()];
 
                 if (connection.Database.GetPendingMigrations().Any()) connection.Database.Migrate();
             }
