@@ -2,7 +2,7 @@
 {
     public interface ISelectRepositoryBase<T> where T : class
     {
-        IQueryable<T> GetQuerable();
+        IQueryable<T> GetQueryable();
         IEnumerable<T> Get(Func<T, bool> query);
     }
 }

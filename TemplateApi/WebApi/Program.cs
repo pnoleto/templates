@@ -1,5 +1,4 @@
 using Infra.DI;
-using System.Reflection;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -11,12 +10,11 @@ builder.Services.AddEndpointsApiExplorer()
      //.ExecuteMigrationsOnStartup("LocaDb")
      .AddApiKeyAuthentication()
      .AddSwaggerDefinitions(
-        xmlDocumentName: Assembly.GetExecutingAssembly().GetName().Name, 
+        xmlDocumentName: System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, 
         addApiKeyDefinitions: true
      ).AddInMemoryDbContext()
      .AddExceptionHandler()
      .AddCorsDefinitions()
-     .AddProblemDetails()
      .AddScheduledJobs()
      .AddRepositories()
      .AddFeedRobots()
@@ -26,11 +24,10 @@ builder.Services.AddEndpointsApiExplorer()
 WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
-    app.UseSwaggerUIDefinitions()
-        .UseExceptionHandler("/Error")
-        .UseDeveloperExceptionPage();
+    app.UseSwaggerUIDefinitions();
 
-app.UseHttpsRedirection()
+app.UseExceptionHandler()
+    .UseHttpsRedirection()
     .UseAuthentication()
     .UseAuthorization()
     .UseProtectedHangFireDashboard()

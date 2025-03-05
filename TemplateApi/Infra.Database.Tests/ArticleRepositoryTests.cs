@@ -1,7 +1,7 @@
-﻿using Domain.Interfaces.Repositories;
-using Domain.Models;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Domain.Interfaces.Repositories;
 using Infra.Database.ModelDbContext;
+using Domain.Models;
 using Infra.DI;
 
 namespace Infra.Database.Tests
@@ -21,12 +21,6 @@ namespace Infra.Database.Tests
             _sourceRepository = provider.GetRequiredService<ISourceRepository>();
         }
 
-        [SetUp]
-        public void SetUp()
-        {
-
-        }
-
         [Test, Order(1)]
         public void EnsureRepositoryBaseToBeDefined()
         {
@@ -36,11 +30,17 @@ namespace Infra.Database.Tests
         [Test, Order(2)]
         public void EnsureSourceToBeInserted()
         {
-            AddEntity();
+            var entity = _sourceRepository.Add(
+                            new Source
+                            {
+                                Name = "Test",
+                                Url = "Test",
+                                Active = false,
+                            });
 
-            var entity = _sourceRepository.Get(y=> true).Any();
+            bool hasEntities = _sourceRepository.Get(y=> y.Active).Any();
 
-            Assert.That(entity, Is.True);
+            Assert.That(hasEntities, Is.True);
         }
 
         [Test, Order(3)]
@@ -67,17 +67,6 @@ namespace Infra.Database.Tests
             bool entityExists = _sourceRepository.Get(y => true).Any();
 
             Assert.That(entityExists, Is.False);
-        }
-
-        private void AddEntity()
-        {
-            _sourceRepository.Add(
-                new Source
-                {
-                    Name = "Test",
-                    Url = "Test",
-                    Active = false,
-                });
         }
 
         [OneTimeTearDown]

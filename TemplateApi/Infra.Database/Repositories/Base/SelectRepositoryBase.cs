@@ -13,7 +13,7 @@ namespace Infra.Database.Repositories.Base
             return _dbContext.Set<T>().Where(query);
         }
 
-        public IQueryable<T> GetQuerable()
+        public IQueryable<T> GetQueryable()
         {
             return _dbContext.Set<T>().AsQueryable();
         }

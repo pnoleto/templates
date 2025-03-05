@@ -4,7 +4,6 @@ namespace Application.DTO
 {
     public class EverythingQuery : QueryBase
     {
-        public EverythingQuery() { }
         public string? QInTitle { get; set; }
         public string? Domains { get; set; }
         public string? ExcludedDomains { get; set; }

@@ -2,16 +2,27 @@
 using Domain.Models;
 using MediatR;
 using Application.DTO.Base;
+using FluentValidation;
+using Application.DTO;
 
 namespace Application
 {
-    public class EverythingHandler(ISelectRepositoryBase<Article> selectRepository) : IRequestHandler<EverythingEvent, ArticleResult>
+    public class EverythingHandler : BaseValidationHandler<EverythingQuery>, IRequestHandler<EverythingEvent, ArticleResult>
     {
+        private readonly ISelectRepositoryBase<Article> selectRepository;
+
+        public EverythingHandler(ISelectRepositoryBase<Article> selectRepository)
+        {
+            this.selectRepository = selectRepository;
+        }
+
         public Task<ArticleResult> Handle(EverythingEvent request, CancellationToken cancellationToken)
         {
-            return Task.Run(() =>
+            return Task.Run(async() =>
             {
-                IQueryable<Article> query = selectRepository.GetQuerable();
+                await this.ValidateAndThrowAsync(request);
+
+                IQueryable<Article> query = selectRepository.GetQueryable();
 
                 if (!string.IsNullOrEmpty(request.QInTitle)) query = query.Where(x => x.Title.Contains(request.Source));
 
