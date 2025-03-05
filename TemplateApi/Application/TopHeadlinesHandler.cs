@@ -2,17 +2,28 @@
 using Domain.Models;
 using MediatR;
 using Application.DTO.Base;
+using FluentValidation;
 
 namespace Application
 {
-    public class TopHeadlinesHandler(ISelectRepositoryBase<Article> selectRepository) : IRequestHandler<TopHeadlinesEvent, ArticleResult>
+    public class TopHeadlinesHandler : BaseValidationHandler<TopHeadlinesEvent>, IRequestHandler<TopHeadlinesEvent, ArticleResult>
     {
+        private readonly ISelectRepositoryBase<Article> selectRepository;
+
+        public TopHeadlinesHandler(ISelectRepositoryBase<Article> selectRepository)
+        {
+            this.selectRepository = selectRepository;
+        }
+
         public Task<ArticleResult> Handle(TopHeadlinesEvent request, CancellationToken cancellationToken)
         {
-            return Task.Run(() =>
+            return Task.Run(async() =>
             {
+
+                await this.ValidateAndThrowAsync(request);
+
                 IQueryable<Article> query = selectRepository
-                .GetQuerable();
+                .GetQueryable();
 
                 if (!string.IsNullOrEmpty(request.Q)) query = query.Where(x => x.Title.Contains(request.Q) || x.Description.Contains(request.Q) || x.Content.Contains(request.Q));
 
@@ -27,7 +38,7 @@ namespace Application
                 return new ArticleResult
                 {
                     Articles = query
-                    .Skip((int)((request.Page - 1) * request.PageSize))
+                    .Skip((request.Page - 1) * request.PageSize)
                     .Take(request.PageSize)
                     .AsEnumerable(),
                     TotalPages = (int)Math.Ceiling(query.Count() / (decimal)request.PageSize)
