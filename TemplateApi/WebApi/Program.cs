@@ -1,38 +1,54 @@
+using Infra.Database.ModelDbContext;
 using Infra.DI;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+internal class Program
+{
+    private static void Main(string[] args)
+    {
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.AddOpenTelemetryLogger();
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer()
-     .AddHangFireSchedulerWithInMemoryDb()
-     .AddOpenTelemetryInstrumentation()
-     //.ExecuteMigrationsOnStartup("LocaDb")
-     .AddApiKeyAuthentication()
-     .AddSwaggerDefinitions(
-        xmlDocumentName: System.Reflection.Assembly.GetExecutingAssembly().GetName().Name, 
-        addApiKeyDefinitions: true
-     ).AddInMemoryDbContext()
-     .AddExceptionHandler()
-     .AddCorsDefinitions()
-     .AddScheduledJobs()
-     .AddRepositories()
-     .AddFeedRobots()
-     .AddMediator()
-     .AddLogging();
+        builder.AddOpenTelemetryLogger();
+        builder.Services.AddControllers();
+        builder.Services.AddEndpointsApiExplorer()
+             .AddHangFireSchedulerWithInMemoryDb()
+             .AddOpenTelemetryInstrumentation()
+             //.ExecuteMigrationsOnStartup("LocaDb")
+             .AddApiKeyAuthentication()
+             .AddSwaggerDefinitions(
+                xmlDocumentName: System.Reflection.Assembly.GetExecutingAssembly().GetName().Name,
+                addApiKeyDefinitions: true
+             ).AddInMemoryDbContext()
+             .AddHttpCLientFactory()
+             .AddExceptionHandler()
+             .AddCorsDefinitions()
+             .AddScheduledJobs()
+             .AddRepositories()
+             .AddHttpClient()
+             .AddFeedRobots()
+             .AddMediator()
+             .AddLogging();
 
-WebApplication app = builder.Build();
+        builder.Services
+            .AddHealthChecks()
+            .AddCheckDatabase<NewsDbContext>()
+            .AddCheckHosts("requiredHosts")
+            .AddCheckGoogle();
 
-if (app.Environment.IsDevelopment())
-    app.UseSwaggerUIDefinitions();
+        WebApplication app = builder.Build();
 
-app.UseExceptionHandler()
-    .UseHttpsRedirection()
-    .UseAuthentication()
-    .UseAuthorization()
-    .UseProtectedHangFireDashboard()
-    .UseScheduledJobs()
-    .UseCors();
+        if (app.Environment.IsDevelopment())
+            app.UseSwaggerUIDefinitions();
 
-app.MapControllers();
-app.Run();
+        app.UseExceptionHandler()
+            .UseHttpsRedirection()
+            .UseAuthentication()
+            .UseAuthorization()
+            .UseProtectedHangFireDashboard()
+            .UseScheduledJobs()
+            .UseCors();
+
+        app.MapHealthChecks("/health");
+        app.MapControllers();
+        app.Run();
+    }
+}

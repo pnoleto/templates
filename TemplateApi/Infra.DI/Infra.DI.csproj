@@ -27,6 +27,7 @@
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.11.2" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.11.2" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.11.0" />
+    <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.3.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.3.1" />
@@ -36,6 +37,7 @@
     <ProjectReference Include="..\Application.RecurringJobs\Infra.RecurringJobs.csproj" />
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Infra.Database\Infra.Database.csproj" />
+    <ProjectReference Include="..\Infra.Integrations\Infra.Integrations.csproj" />
     <ProjectReference Include="..\Infra.Migrations\Infra.Migrations.csproj" />
   </ItemGroup>
 
