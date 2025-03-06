@@ -19,3 +19,7 @@ Oque tem nesse template?
 * HangFire Recurring Jobs
 * TAP Pattern
 * Extension Methods
+* Refit HttpClient
+* FLuent Validation
+* Health Checks
+* Migrations
