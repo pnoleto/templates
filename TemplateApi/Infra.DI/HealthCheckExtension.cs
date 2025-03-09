@@ -1,88 +1,69 @@
-﻿using Infra.Integrations;
-using Microsoft.EntityFrameworkCore;
+﻿using HealthChecks.ApplicationStatus.DependencyInjection;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Infra.DI
 {
     public static class HealthCheckExtension
     {
-        private static async Task<HealthCheckResult> CheckGoogle(IHealthChecksBuilder builder)
+        public static IHealthChecksBuilder CheckSqlServer(this IHealthChecksBuilder builder, string connectionStringName)
         {
-            ArgumentNullException.ThrowIfNull(builder.Services);
+            IConfiguration configuration = builder.Services
+                .BuildServiceProvider()
+                .GetRequiredService<IConfiguration>();
 
-            IGoogleClient googleClient = builder.Services.BuildServiceProvider().GetRequiredService<IGoogleClient>();
-
-            try
-            {
-                await googleClient.Get();
-            }
-            catch
-            {
-                HealthCheckResult.Unhealthy("Coldn't connect");
-            }
-
-            return HealthCheckResult.Healthy("checked succesful");
-        }
-
-        private static async Task<HealthCheckResult> CheckDb<TContext>(IHealthChecksBuilder builder) where TContext: DbContext
-        {
-            ArgumentNullException.ThrowIfNull(builder.Services);
-
-            TContext dbContext = builder.Services.BuildServiceProvider().GetRequiredService<TContext>();
-
-            bool canConnect = await dbContext.Database.CanConnectAsync();
-
-            if (!canConnect) HealthCheckResult.Unhealthy("Coldn't connect to database");
-
-            return HealthCheckResult.Healthy("Db checked succesful");
-        }
-
-        private static async Task<HealthCheckResult> CheckHosts(IHealthChecksBuilder builder, string hostsSectionName)
-        {
-            ArgumentNullException.ThrowIfNull(builder.Services);
-
-            IConfiguration configuration = builder.Services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+            string? connectionString = configuration.GetConnectionString(connectionStringName);
 
             ArgumentNullException.ThrowIfNull(configuration);
 
-            HttpClient httpClient = builder.Services.BuildServiceProvider().GetRequiredService<HttpClient>();
+            ArgumentNullException.ThrowIfNull(connectionString);
 
-            ArgumentNullException.ThrowIfNull(httpClient);
+            return builder.AddSqlServer(connectionString, name: "sql_server");
+        }
 
-            string[] hosts = configuration.GetRequiredSection(hostsSectionName).Get<string[]>();
+        public static IHealthChecksBuilder CheckUris(this IHealthChecksBuilder builder, IEnumerable<Uri> Uris)
+        {
+            IConfiguration configuration = builder.Services
+                .BuildServiceProvider()
+                .GetRequiredService<IConfiguration>();
 
-            ArgumentNullException.ThrowIfNull(hosts);
+            return builder.AddUrlGroup(Uris, name: "external_uris");
+        }
 
-            try
+        public static IHealthChecksBuilder CheckSystem(this IHealthChecksBuilder builder)
+        {
+            return builder.AddDiskStorageHealthCheck(options => options
+                .WithCheckAllDrives(), name: "disk_storage")
+             .AddApplicationStatus(name: "application");
+        }
+
+        public static IServiceCollection AddHealthUI(this IServiceCollection services)
+        {
+            services.AddHealthChecksUI(option=> option
+                .MaximumHistoryEntriesPerEndpoint(5)
+                .SetApiMaxActiveRequests(1))
+             .AddInMemoryStorage(options=> options
+                .EnableDetailedErrors()
+                .EnableSensitiveDataLogging());
+
+            return services;
+        }
+
+        public static IApplicationBuilder UseHealthUI(this IApplicationBuilder services)
+        {
+            return services.UseRouting()
+            .UseEndpoints(config =>
             {
-                foreach (string host in hosts)
+                config.MapHealthChecksUI();
+                config.MapHealthChecks("/health", new HealthCheckOptions
                 {
-                    HttpResponseMessage response = await httpClient.GetAsync(host);
-                }
-            }
-            catch
-            {
-                return HealthCheckResult.Healthy("Hosts check error");
-            }
-
-            return HealthCheckResult.Healthy("Db checked succesful");
-        }
-
-        public static IHealthChecksBuilder AddCheckDatabase<TContext>(this IHealthChecksBuilder builder) where TContext : DbContext
-        {
-            return builder.AddAsyncCheck(nameof(TContext), () => CheckDb<TContext>(builder), ["Database", "Status"]);
-        }
-
-        public static IHealthChecksBuilder AddCheckHosts(this IHealthChecksBuilder builder, string requiredHostsSection)
-        {
-            return builder.AddAsyncCheck(nameof(requiredHostsSection), ()=> CheckHosts(builder, requiredHostsSection), ["Hosts", "Endpoints", "Integrated", "Services"]);
-        }
-
-        public static IHealthChecksBuilder AddCheckGoogle(this IHealthChecksBuilder builder)
-        {
-            return builder.AddAsyncCheck("Google", () => CheckGoogle(builder), ["Hosts", "Endpoints", "Google", "Rest", "HttpClient"]);
+                    Predicate = _ => true,
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
+            });
         }
     }
 }

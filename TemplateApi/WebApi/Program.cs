@@ -1,5 +1,6 @@
 using Infra.Database.ModelDbContext;
 using Infra.DI;
+using System.Collections.Immutable;
 
 internal class Program
 {
@@ -26,28 +27,29 @@ internal class Program
              .AddHttpClient()
              .AddFeedRobots()
              .AddMediator()
+             .AddHealthUI()
              .AddLogging();
 
         builder.Services
             .AddHealthChecks()
-            .AddCheckDatabase<NewsDbContext>()
-            .AddCheckHosts("requiredHosts")
-            .AddCheckGoogle();
+            .CheckSqlServer("LocalDb")
+            .CheckSystem();
 
         WebApplication app = builder.Build();
 
+
         if (app.Environment.IsDevelopment())
-            app.UseSwaggerUIDefinitions();
+            app.UseSwaggerUIDefinitions()
+                .UseHealthUI()
+                .UseProtectedHangFireDashboard();
 
         app.UseExceptionHandler()
             .UseHttpsRedirection()
             .UseAuthentication()
             .UseAuthorization()
-            .UseProtectedHangFireDashboard()
             .UseScheduledJobs()
             .UseCors();
 
-        app.MapHealthChecks("/health");
         app.MapControllers();
         app.Run();
     }
