@@ -1,11 +1,13 @@
 ﻿using Domain.Interfaces.Repositories.Base;
 using Domain.Models;
 using MediatR;
-using Application.DTO.Base;
 using FluentValidation;
 using Application.DTO;
+using Application.Results;
+using Application.Events;
+using Application.Handlers.Base;
 
-namespace Application
+namespace Application.Handlers
 {
     public class EverythingHandler : BaseValidationHandler<EverythingQuery>, IRequestHandler<EverythingEvent, ArticleResult>
     {

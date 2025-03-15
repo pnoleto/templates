@@ -9,12 +9,12 @@ namespace Infra.DI
 {
     public static class SwaggerExtension
     {
-        public static IServiceCollection AddSwaggerDefinitions(this IServiceCollection services, string? xmlDocumentName, bool addApiKeyDefinitions = false)
+        public static IServiceCollection AddSwaggerDefinitions(this IServiceCollection services, string? xmlDocumentName)
         {
-            return services.AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions(xmlDocumentName, addApiKeyDefinitions)
+            return services.AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions(xmlDocumentName)
                 .AddApiExplorerWithVersioning();
         }
-        private static IServiceCollection AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions(this IServiceCollection services, string? xmlDocumentName, bool addApiKeyDefinitions = false)
+        private static IServiceCollection AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions(this IServiceCollection services, string? xmlDocumentName)
         {
             return services.AddSwaggerGen(options =>
             {
@@ -24,10 +24,6 @@ namespace Infra.DI
                 foreach (ApiVersionDescription apiVersion in provider.ApiVersionDescriptions)
                 {
                     options.AddSwaggerDocument(apiVersion);
-
-                    if (addApiKeyDefinitions)
-                        options.AddApiKeySecurityDefinition()
-                        .AddApiKeySecurityRequirement();
                 }
 
                 if (!string.IsNullOrEmpty(xmlDocumentName))
@@ -52,40 +48,6 @@ namespace Infra.DI
             {
                 Title = item.ApiVersion.ToString(),
                 Version = item.ApiVersion.ToString()
-            });
-
-            return options;
-        }
-
-        private static SwaggerGenOptions AddApiKeySecurityRequirement(this SwaggerGenOptions options)
-        {
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                       Reference = new OpenApiReference
-                       {
-                           Id = "ApiKey",
-                           Type = ReferenceType.SecurityScheme
-                       }
-                    },
-                    Array.Empty<string>()
-                }
-            });
-
-            return options;
-        }
-
-        private static SwaggerGenOptions AddApiKeySecurityDefinition(this SwaggerGenOptions options)
-        {
-            options.AddSecurityDefinition("ApiKey", new()
-            {
-                In = ParameterLocation.Header,
-                Scheme = "ApiKey",
-                Name = "x-api-key",
-                Type = SecuritySchemeType.ApiKey,
-                Description = "Authorization by x-api-key inside request's header"
             });
 
             return options;

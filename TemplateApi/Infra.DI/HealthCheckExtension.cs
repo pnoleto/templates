@@ -9,12 +9,8 @@ namespace Infra.DI
 {
     public static class HealthCheckExtension
     {
-        public static IHealthChecksBuilder CheckSqlServer(this IHealthChecksBuilder builder, string connectionStringName)
+        public static IHealthChecksBuilder CheckSqlServer(this IHealthChecksBuilder builder, IConfiguration configuration, string connectionStringName)
         {
-            IConfiguration configuration = builder.Services
-                .BuildServiceProvider()
-                .GetRequiredService<IConfiguration>();
-
             string? connectionString = configuration.GetConnectionString(connectionStringName);
 
             ArgumentNullException.ThrowIfNull(configuration);
@@ -24,11 +20,9 @@ namespace Infra.DI
             return builder.AddSqlServer(connectionString, name: "sql_server");
         }
 
-        public static IHealthChecksBuilder CheckUris(this IHealthChecksBuilder builder, IEnumerable<Uri> Uris)
+        public static IHealthChecksBuilder CheckUris(this IHealthChecksBuilder builder, IConfiguration configuration, IEnumerable<Uri> Uris)
         {
-            IConfiguration configuration = builder.Services
-                .BuildServiceProvider()
-                .GetRequiredService<IConfiguration>();
+            ArgumentNullException.ThrowIfNull(configuration);
 
             return builder.AddUrlGroup(Uris, name: "external_uris");
         }

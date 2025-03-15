@@ -1,4 +1,4 @@
-﻿using Application;
+﻿using Application.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infra.DI

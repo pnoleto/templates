@@ -5,11 +5,8 @@ namespace Infra.DI
 {
     public static class CorsExtension
     {
-        public static IServiceCollection AddCorsDefinitions(this IServiceCollection services)
+        public static IServiceCollection AddCorsDefinitions(this IServiceCollection services, IConfiguration configuration)
         {
-            IConfiguration configuration = services.BuildServiceProvider()
-                .GetRequiredService<IConfiguration>();
-
             return services.AddCors(cors =>
                 cors.AddDefaultPolicy(policy =>
                     policy.WithHeaders(configuration.GetRequiredSection("Cors:Headers").Get<string[]>() ?? [])

@@ -10,11 +10,8 @@ namespace Infra.DI
         private const int THIRTY_SECONDS = 30;
         private const int THREE_RETRIES = 3;
 
-        public static IServiceCollection AddSqlServerDbContext(this IServiceCollection services, string connectionStringName)
+        public static IServiceCollection AddSqlServerDbContext(this IServiceCollection services, IConfiguration configuration, string connectionStringName)
         {
-            IConfiguration configuration = services.BuildServiceProvider()
-                .GetRequiredService<IConfiguration>();
-
             services.AddDbContext<NewsDbContext>(cfg => cfg.UseSqlServer(configuration
                 .GetConnectionString(connectionStringName),
                 builder =>
@@ -26,11 +23,8 @@ namespace Infra.DI
             return services;
         }
 
-        public static IServiceCollection AddPostgresDbContext(this IServiceCollection services, string connectionStringName)
+        public static IServiceCollection AddPostgresDbContext(this IServiceCollection services, IConfiguration configuration, string connectionStringName)
         {
-            IConfiguration configuration = services.BuildServiceProvider()
-                .GetRequiredService<IConfiguration>();
-
             services.AddDbContext<NewsDbContext>(cfg => cfg.UseNpgsql(configuration
                 .GetConnectionString(connectionStringName),
                 builder =>

@@ -1,14 +1,12 @@
-﻿
-using FluentValidation;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Extensions;
+using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
-using System.Net;
 using System.Reflection;
+using FluentValidation;
+using System.Net;
 
 namespace Infra.DI
 {
@@ -16,9 +14,30 @@ namespace Infra.DI
     {
         private static Dictionary<string, object?> LoadRequestHeaders(HttpContext httpContext)
         {
-            return httpContext.Request.Headers
+            Dictionary<string, object?> headers = httpContext.Request.Headers
                 .Select(item => ((string)item.Key, (object?)item.Value))
                 .ToDictionary();
+
+            headers.Add("datetime", DateTime.Now.ToString("G"));
+
+            return headers;
+        }
+
+        private static ProblemDetailsContext GetProblemDetailsContext(HttpContext httpContext, Exception exception, int responseCode)
+        {
+            return new()
+            {
+                Exception = exception,
+                HttpContext = httpContext,
+                ProblemDetails = new()
+                {
+                    Status = responseCode,
+                    Title = ((HttpStatusCode)responseCode).GetDisplayName(),
+                    Type = exception.GetType().Name,
+                    Detail = exception.Message,
+                    Extensions = LoadRequestHeaders(httpContext)
+                }
+            };
         }
 
         public ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
@@ -34,41 +53,30 @@ namespace Infra.DI
 
             httpContext.Response.StatusCode = responseCode;
 
-            IDictionary<string, object?> headers = LoadRequestHeaders(httpContext);
+            ProblemDetailsContext problemDetailsContext = GetProblemDetailsContext(httpContext, exception, responseCode);
 
-            headers.Add("datetime", DateTime.Now.ToString("G"));
-
-            ProblemDetails problemDetails = new()
-            {
-                Status = responseCode,
-                Title = ((HttpStatusCode)responseCode).GetDisplayName(),
-                Type = exception.GetType().Name,
-                Detail = exception.Message,
-                Extensions = headers
-            };
-
-            return problemDetailsService.TryWriteAsync(new ProblemDetailsContext
-            {
-                Exception = exception,
-                HttpContext = httpContext,
-                ProblemDetails = problemDetails
-            });
+            return problemDetailsService.TryWriteAsync(problemDetailsContext);
         }
     }
 
     public static class ExceptionHandlerExtension
     {
+        private static string GetRequestPath(ProblemDetailsContext context)
+        {
+            return $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
+        }
+
         public static IServiceCollection AddExceptionHandler(this IServiceCollection services) => services
             .AddProblemDetails(options =>
             {
                 options.CustomizeProblemDetails = context =>
                 {
-                    context.ProblemDetails.Instance =
-                        $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
+                    context.ProblemDetails.Instance = GetRequestPath(context);
 
                     context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
 
                     Activity? activity = context.HttpContext.Features.Get<IHttpActivityFeature>()?.Activity;
+
                     context.ProblemDetails.Extensions.TryAdd("traceId", activity?.Id);
                 };
             })

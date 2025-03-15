@@ -1,6 +1,7 @@
-﻿using Domain.Models;
+﻿using Application.Results.Base;
+using Domain.Models;
 
-namespace Application.DTO.Base
+namespace Application.Results
 {
     public class SourceResult: ResultBase
     {

@@ -1,8 +1,8 @@
 ﻿using Application.DTO;
-using Application.DTO.Base;
+using Application.Results;
 using MediatR;
 
-namespace Application
+namespace Application.Events
 {
     public class EverythingEvent : EverythingQuery, IRequest<ArticleResult>
     {

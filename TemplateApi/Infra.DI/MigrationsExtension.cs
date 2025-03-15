@@ -9,7 +9,7 @@ namespace Infra.DI
 {
     public static class MigrationsExtension
     {
-        public static IServiceCollection ExecuteMigrationsOnStartup(this IServiceCollection services, string connectionStringName)
+        public static IServiceCollection ExecuteMigrationsOnStartup(this IServiceCollection services, IConfiguration configuration, string connectionStringName)
         {
             ArgumentNullException.ThrowIfNull(services);
 
@@ -22,9 +22,7 @@ namespace Infra.DI
             using (IServiceScope serviceScope = serviceProvider.CreateScope())
             {
                 string? connectionString = string.Empty;
-
-                IConfiguration configuration = serviceProvider.GetRequiredService<IConfiguration>();
-                
+               
                 connectionString = configuration.GetConnectionString(connectionStringName);
 
                 ArgumentNullException.ThrowIfNull(connectionString);

@@ -1,4 +1,4 @@
-﻿namespace Application.DTO.Base
+﻿namespace Application.Results.Base
 {
     public class ResultBase
     {

@@ -1,7 +1,7 @@
 ﻿using Application.DTO.Base;
 using FluentValidation;
 
-namespace Application
+namespace Application.Handlers.Base
 {
     public class BaseValidationHandler<T> : AbstractValidator<T> where T: PagingBase
     {

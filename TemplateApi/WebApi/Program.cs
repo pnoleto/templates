@@ -1,6 +1,4 @@
-using Infra.Database.ModelDbContext;
 using Infra.DI;
-using System.Collections.Immutable;
 
 internal class Program
 {
@@ -11,17 +9,15 @@ internal class Program
         builder.AddOpenTelemetryLogger();
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer()
+             .AddSwaggerDefinitions(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name)
+             //.ExecuteMigrationsOnStartup(builder.Configuration, "LocaDb")
+             .AddSqlServerDbContext(builder.Configuration, "LocaDb")
+             .AddOpenTelemetryInstrumentation(builder.Configuration)
+             .AddCorsDefinitions(builder.Configuration)
              .AddHangFireSchedulerWithInMemoryDb()
-             .AddOpenTelemetryInstrumentation()
-             //.ExecuteMigrationsOnStartup("LocaDb")
-             .AddApiKeyAuthentication()
-             .AddSwaggerDefinitions(
-                xmlDocumentName: System.Reflection.Assembly.GetExecutingAssembly().GetName().Name,
-                addApiKeyDefinitions: true
-             ).AddInMemoryDbContext()
+             .AddJwtDefinitions(builder)
              .AddHttpCLientFactory()
              .AddExceptionHandler()
-             .AddCorsDefinitions()
              .AddScheduledJobs()
              .AddRepositories()
              .AddHttpClient()
@@ -30,25 +26,24 @@ internal class Program
              .AddHealthUI()
              .AddLogging();
 
-        builder.Services
-            .AddHealthChecks()
-            .CheckSqlServer("LocalDb")
+        builder.Services.AddHealthChecks()
+            .CheckSqlServer(builder.Configuration,"LocalDb")
             .CheckSystem();
 
         WebApplication app = builder.Build();
 
-
         if (app.Environment.IsDevelopment())
-            app.UseSwaggerUIDefinitions()
-                .UseHealthUI()
-                .UseProtectedHangFireDashboard();
+            app.UseProtectedHangFireDashboard()
+                .UseSwaggerUIDefinitions()
+                .UseHealthUI();
 
         app.UseExceptionHandler()
             .UseHttpsRedirection()
             .UseAuthentication()
             .UseAuthorization()
             .UseScheduledJobs()
-            .UseCors();
+            .UseCors()
+            .UseHsts();
 
         app.MapControllers();
         app.Run();
