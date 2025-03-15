@@ -9,9 +9,18 @@ using Application.Events;
 
 namespace Application.Handlers
 {
-    public class LoginHandler : IRequestHandler<LoginEvent, LoginResult>, IRequestHandler<RenewAccessTokenEvent, LoginResult>
-    {
-        private static ClaimsPrincipal ValidateToken(RenewAccessTokenEvent request, JwtSecurityTokenHandler tokenHandler)
+    public class LoginHandler : IRequestHandler<LoginEvent, LoginResult>, IRequestHandler<RenewAccessTokenEvent, LoginResult>{
+
+        private readonly string secretKeyHash;
+
+        public LoginHandler()
+        {
+            secretKeyHash = Environment.GetEnvironmentVariable("JwtSettings:SecretKeyHash");
+
+            if (secretKeyHash is null) ArgumentNullException.ThrowIfNull(secretKeyHash);
+        }
+
+        private ClaimsPrincipal ValidateToken(RenewAccessTokenEvent request, JwtSecurityTokenHandler tokenHandler)
         {
             return tokenHandler.ValidateToken(
                 request.RefreshToken,
@@ -19,7 +28,7 @@ namespace Application.Handlers
                 {
                     ValidateIssuer = false,
                     ValidAudience = "localhost",
-                    IssuerSigningKey = new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes("SECRET KEY"))),
+                    IssuerSigningKey = new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(secretKeyHash))),
                     ClockSkew = TimeSpan.FromSeconds(0),
                     RequireExpirationTime = true,
                     RequireSignedTokens = true,
@@ -28,7 +37,7 @@ namespace Application.Handlers
             out _);
         }
 
-        private static Task<string> GenerateToken(ClaimsPrincipal claimsIdentity, DateTime expirationDate)
+        private Task<string> GenerateToken(ClaimsPrincipal claimsIdentity, DateTime expirationDate)
         {
             JwtSecurityTokenHandler tokenHandler = new();
             SecurityTokenDescriptor tokenDescriptor = new()
@@ -39,7 +48,7 @@ namespace Application.Handlers
                 Subject = (ClaimsIdentity)claimsIdentity.Identity,
                 Expires = expirationDate,
                 SigningCredentials = new(
-                    new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes("SECRET KEY"))),
+                    new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(secretKeyHash))),
                     SecurityAlgorithms.HmacSha256Signature)
             };
 

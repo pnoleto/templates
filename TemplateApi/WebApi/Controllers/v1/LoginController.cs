@@ -1,8 +1,8 @@
 using MediatR;
 using Asp.Versioning;
-using Microsoft.AspNetCore.Mvc;
-using Application.Results;
 using Application.Events;
+using Application.Results;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.v1
 {
