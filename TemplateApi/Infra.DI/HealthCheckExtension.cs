@@ -2,8 +2,10 @@
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Infra.DI
 {
@@ -30,33 +32,34 @@ namespace Infra.DI
         public static IHealthChecksBuilder CheckSystem(this IHealthChecksBuilder builder)
         {
             return builder.AddDiskStorageHealthCheck(options => options
-                .WithCheckAllDrives(), name: "disk_storage")
-             .AddApplicationStatus(name: "application");
+             .WithCheckAllDrives(), name: "disk_storage")
+                .AddApplicationStatus(name: "application");
         }
 
-        public static IServiceCollection AddHealthUI(this IServiceCollection services)
+        public static IServiceCollection AddHealthCheckUI(this IServiceCollection services)
         {
-            services.AddHealthChecksUI(option=> option
-                .MaximumHistoryEntriesPerEndpoint(5)
+            services.AddHealthChecksUI(opt =>
+             opt.SetEvaluationTimeInSeconds(10)
+                .MaximumHistoryEntriesPerEndpoint(10)
                 .SetApiMaxActiveRequests(1))
-             .AddInMemoryStorage(options=> options
-                .EnableDetailedErrors()
-                .EnableSensitiveDataLogging());
+            .AddInMemoryStorage();
 
             return services;
         }
 
-        public static IApplicationBuilder UseHealthUI(this IApplicationBuilder services)
+        public static IApplicationBuilder UseHealthCheckEndpoint(this IApplicationBuilder services)
         {
-            return services.UseRouting()
-            .UseEndpoints(config =>
+            return services.UseHealthChecks("/health", new HealthCheckOptions
             {
-                config.MapHealthChecksUI();
-                config.MapHealthChecks("/health", new HealthCheckOptions
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
+                ResultStatusCodes =
                 {
-                    Predicate = _ => true,
-                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-                });
+                    [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                    [HealthStatus.Degraded] = StatusCodes.Status500InternalServerError,
+                    [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable,
+                },
+                AllowCachingResponses = false
             });
         }
     }

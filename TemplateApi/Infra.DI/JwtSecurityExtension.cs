@@ -4,21 +4,24 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Hosting;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Infra.DI
 {
     public static class JwtSecurityExtension
     {
+        private const string DefaultScheme = "JwtScheme";
+
         public static IServiceCollection AddJwtDefinitions(this IServiceCollection services, IHostApplicationBuilder builder)
         {
             ArgumentNullException.ThrowIfNull(builder.Configuration);
 
-            string? SecretKeyHash = builder.Configuration.GetRequiredSection("JwtSettings:SecretKeyHash").Get<string>();
+            string? secretKeyHash = builder.Configuration.GetRequiredSection("JwtSettings:SecretKeyHash").Get<string>();
 
-            ArgumentNullException.ThrowIfNull(SecretKeyHash);
+            ArgumentNullException.ThrowIfNull(secretKeyHash);
 
-            services.AddAuthentication()
-            .AddJwtBearer("JwtScheme", jwtOptions =>
+            services.AddAuthentication(DefaultScheme)
+            .AddJwtBearer(DefaultScheme, jwtOptions =>
             {
                 jwtOptions.Audience = builder.Configuration["JwtSettings:Audience"];
                 jwtOptions.TokenValidationParameters = new()
@@ -26,7 +29,7 @@ namespace Infra.DI
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(SecretKeyHash))),
+                    IssuerSigningKey = new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(secretKeyHash))),
                     ValidAudiences = builder.Configuration.GetRequiredSection("JwtSettings:ValidAudiences").Get<string[]>(),
                     ValidIssuers = builder.Configuration.GetRequiredSection("JwtSettings:ValidIssuers").Get<string[]>(),
                     ClockSkew = TimeSpan.FromSeconds(0)
@@ -35,11 +38,12 @@ namespace Infra.DI
             });
 
             services.AddAuthorizationBuilder()
-             .AddPolicy("JwtScheme", policy =>
-                 policy.AddAuthenticationSchemes("JwtScheme")
+             .AddPolicy(DefaultScheme, policy =>
+                 policy.AddAuthenticationSchemes(DefaultScheme)
                  .RequireAuthenticatedUser());
 
             return services;
         }
+
     }
 }

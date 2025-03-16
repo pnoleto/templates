@@ -1,4 +1,6 @@
+using HealthChecks.UI.Client;
 using Infra.DI;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 internal class Program
 {
@@ -19,28 +21,32 @@ internal class Program
              .AddHttpCLientFactory()
              .AddExceptionHandler()
              .AddScheduledJobs()
+             .AddHealthCheckUI()
              .AddRepositories()
              .AddHttpClient()
              .AddFeedRobots()
              .AddMediator()
-             .AddHealthUI()
              .AddLogging();
 
         builder.Services.AddHealthChecks()
-            .CheckSqlServer(builder.Configuration,"LocalDb")
+            .CheckSqlServer(builder.Configuration, "LocalDb")
             .CheckSystem();
 
         WebApplication app = builder.Build();
 
-        if (app.Environment.IsDevelopment())
-            app.UseProtectedHangFireDashboard()
-                .UseSwaggerUIDefinitions()
-                .UseHealthUI();
-
-        app.UseExceptionHandler()
-            .UseHttpsRedirection()
+        app.UseRouting()
             .UseAuthentication()
             .UseAuthorization()
+            .UseHealthCheckEndpoint();
+
+
+        if (app.Environment.IsDevelopment())
+            app.UseHealthChecksUI()
+                .UseSwaggerDefinitions();
+
+        app.UseProtectedHangFireDashboard()
+            .UseExceptionHandler()
+            .UseHttpsRedirection()
             .UseScheduledJobs()
             .UseCors()
             .UseHsts();

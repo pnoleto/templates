@@ -69,7 +69,7 @@ namespace Infra.DI
             return services;
         }
 
-        public static IApplicationBuilder UseSwaggerUIDefinitions(this IApplicationBuilder builder) =>
+        public static IApplicationBuilder UseSwaggerDefinitions(this IApplicationBuilder builder) =>
             builder.UseSwagger()
                 .UseSwaggerUI(options =>
                 {

@@ -15,7 +15,7 @@ namespace Application.Handlers
 
         public LoginHandler()
         {
-            secretKeyHash = Environment.GetEnvironmentVariable("JwtSettings:SecretKeyHash");
+            secretKeyHash = Environment.GetEnvironmentVariable("SecretKeyHash");
 
             if (secretKeyHash is null) ArgumentNullException.ThrowIfNull(secretKeyHash);
         }
