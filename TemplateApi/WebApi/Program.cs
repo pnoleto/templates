@@ -39,7 +39,6 @@ internal class Program
             .UseAuthorization()
             .UseHealthCheckEndpoint();
 
-
         if (app.Environment.IsDevelopment())
             app.UseHealthChecksUI()
                 .UseSwaggerDefinitions();

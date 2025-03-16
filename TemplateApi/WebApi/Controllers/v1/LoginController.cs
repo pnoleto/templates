@@ -14,18 +14,16 @@ namespace WebApi.Controllers.v1
     /// <response code="200">OK</response>
     /// <response code="401">Forbbiden Resource</response>
     /// <response code="500">Internal Server Error</response>
-    [ApiController,
-     ApiVersion("1.0"),
-     Route("api/v{version:apiVersion}/[controller]"), ControllerName("Login")]
-    public class LoginController(IMediator mediator, ILogger<SourceController> logger) : ControllerBase
+    [ControllerName("Login")]
+    public class LoginController(IMediator mediator, ILogger<SourceController> logger): BaseController(mediator, logger)
     {
         /// <summary>
-        /// 
+
         /// </summary>
         /// <param name="loginEvent"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> Get([FromBody] LoginEvent loginEvent)
+        public async Task<IActionResult> Get([FromQuery] LoginEvent loginEvent)
         {
             logger.LogInformation("requesting login...");
 
@@ -40,7 +38,7 @@ namespace WebApi.Controllers.v1
         /// <param name="tokenEvent"></param>
         /// <returns></returns>
         [HttpPatch]
-        public async Task<IActionResult> Patch([FromBody] RenewAccessTokenEvent tokenEvent)
+        public async Task<IActionResult> Patch([FromQuery] RenewAccessTokenEvent tokenEvent)
         {
             logger.LogInformation("requesting renew access token...");
 
