@@ -25,7 +25,7 @@ namespace WebApi.Controllers.v1
         /// <param name="loginEvent"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] LoginEvent loginEvent)
+        public async Task<IActionResult> Get([FromBody] LoginEvent loginEvent)
         {
             logger.LogInformation("requesting login...");
 
@@ -40,7 +40,7 @@ namespace WebApi.Controllers.v1
         /// <param name="tokenEvent"></param>
         /// <returns></returns>
         [HttpPatch]
-        public async Task<IActionResult> Patch([FromQuery] RenewAccessTokenEvent tokenEvent)
+        public async Task<IActionResult> Patch([FromBody] RenewAccessTokenEvent tokenEvent)
         {
             logger.LogInformation("requesting renew access token...");
 
