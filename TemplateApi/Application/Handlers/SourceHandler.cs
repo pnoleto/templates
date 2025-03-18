@@ -8,15 +8,8 @@ using Application.Handlers.Base;
 
 namespace Application.Handlers
 {
-    public class SourceHandler : BaseValidationHandler<SourceEvent>, IRequestHandler<SourceEvent, SourceResult>
+    public class SourceHandler(ISelectRepositoryBase<Source> selectRepository) : BaseValidationHandler<SourceEvent>, IRequestHandler<SourceEvent, SourceResult>
     {
-        private readonly ISelectRepositoryBase<Source> selectRepository;
-
-        public SourceHandler(ISelectRepositoryBase<Source> selectRepository)
-        {
-            this.selectRepository = selectRepository;
-        }
-
         public Task<SourceResult> Handle(SourceEvent request, CancellationToken cancellationToken)
         {
             return Task.Run(async() =>

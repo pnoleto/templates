@@ -31,6 +31,8 @@ namespace Application.Handlers
 
         private Task<string> GenerateToken(ClaimsPrincipal claimsIdentity, DateTime expirationDate)
         {
+            ArgumentNullException.ThrowIfNull(claimsIdentity.Identity);
+
             JwtSecurityTokenHandler tokenHandler = new();
             SecurityTokenDescriptor tokenDescriptor = new()
             {

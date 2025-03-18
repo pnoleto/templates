@@ -15,7 +15,7 @@ namespace WebApi.Controllers.v1
     /// <response code="401">Forbbiden Resource</response>
     /// <response code="500">Internal Server Error</response>
     [ControllerName("sources")]
-    public class SourceController(IMediator mediator, ILogger<SourceController> logger) : BaseController(mediator, logger)
+    public class SourceController(IMediator mediator, ILogger<SourceController> logger) : BaseController
     {
         /// <summary>
         /// Get Sources

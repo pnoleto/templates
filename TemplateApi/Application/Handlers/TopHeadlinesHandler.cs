@@ -8,15 +8,8 @@ using Application.Handlers.Base;
 
 namespace Application.Handlers
 {
-    public class TopHeadlinesHandler : BaseValidationHandler<TopHeadlinesEvent>, IRequestHandler<TopHeadlinesEvent, ArticleResult>
+    public class TopHeadlinesHandler(ISelectRepositoryBase<Article> selectRepository) : BaseValidationHandler<TopHeadlinesEvent>, IRequestHandler<TopHeadlinesEvent, ArticleResult>
     {
-        private readonly ISelectRepositoryBase<Article> selectRepository;
-
-        public TopHeadlinesHandler(ISelectRepositoryBase<Article> selectRepository)
-        {
-            this.selectRepository = selectRepository;
-        }
-
         public Task<ArticleResult> Handle(TopHeadlinesEvent request, CancellationToken cancellationToken)
         {
             return Task.Run(async() =>

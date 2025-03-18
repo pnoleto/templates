@@ -9,15 +9,8 @@ using Application.Handlers.Base;
 
 namespace Application.Handlers
 {
-    public class EverythingHandler : BaseValidationHandler<EverythingQuery>, IRequestHandler<EverythingEvent, ArticleResult>
+    public class EverythingHandler(ISelectRepositoryBase<Article> selectRepository) : BaseValidationHandler<EverythingQuery>, IRequestHandler<EverythingEvent, ArticleResult>
     {
-        private readonly ISelectRepositoryBase<Article> selectRepository;
-
-        public EverythingHandler(ISelectRepositoryBase<Article> selectRepository)
-        {
-            this.selectRepository = selectRepository;
-        }
-
         public Task<ArticleResult> Handle(EverythingEvent request, CancellationToken cancellationToken)
         {
             return Task.Run(async() =>
