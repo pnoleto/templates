@@ -1,10 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Hosting;
+using Shared;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Infra.DI
 {
@@ -12,26 +10,24 @@ namespace Infra.DI
     {
         private const string DefaultScheme = "JwtScheme";
 
-        public static IServiceCollection AddJwtDefinitions(this IServiceCollection services, IHostApplicationBuilder builder)
+        public static IServiceCollection AddJwtDefinitions(this IServiceCollection services)
         {
-            ArgumentNullException.ThrowIfNull(builder.Configuration);
+            JwtSettings settings = services.BuildServiceProvider().GetRequiredService<JwtSettings>();
 
-            string? secretKeyHash = builder.Configuration.GetRequiredSection("JwtSettings:SecretKeyHash").Get<string>();
-
-            ArgumentNullException.ThrowIfNull(secretKeyHash);
+            ArgumentNullException.ThrowIfNull(settings);
 
             services.AddAuthentication(DefaultScheme)
             .AddJwtBearer(DefaultScheme, jwtOptions =>
             {
-                jwtOptions.Audience = builder.Configuration["JwtSettings:Audience"];
+                jwtOptions.Audience =settings.Audiences[0];
                 jwtOptions.TokenValidationParameters = new()
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(secretKeyHash))),
-                    ValidAudiences = builder.Configuration.GetRequiredSection("JwtSettings:ValidAudiences").Get<string[]>(),
-                    ValidIssuers = builder.Configuration.GetRequiredSection("JwtSettings:ValidIssuers").Get<string[]>(),
+                    IssuerSigningKey = new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(settings.SecretKeyHash))),
+                    ValidAudiences = settings.Audiences,
+                    ValidIssuers = settings.Issuers,
                     ClockSkew = TimeSpan.FromSeconds(0)
                 };
                 jwtOptions.MapInboundClaims = false;

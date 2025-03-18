@@ -6,19 +6,11 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Application.Results;
 using Application.Events;
+using Shared;
 
 namespace Application.Handlers
 {
-    public class LoginHandler : IRequestHandler<LoginEvent, LoginResult>, IRequestHandler<RenewAccessTokenEvent, LoginResult>{
-
-        private readonly string secretKeyHash;
-
-        public LoginHandler()
-        {
-            secretKeyHash = Environment.GetEnvironmentVariable("SecretKeyHash");
-
-            if (secretKeyHash is null) ArgumentNullException.ThrowIfNull(secretKeyHash);
-        }
+    public class LoginHandler(JwtSettings jwtSettings) : IRequestHandler<LoginEvent, LoginResult>, IRequestHandler<RenewAccessTokenEvent, LoginResult>{
 
         private ClaimsPrincipal ValidateToken(RenewAccessTokenEvent request, JwtSecurityTokenHandler tokenHandler)
         {
@@ -27,8 +19,8 @@ namespace Application.Handlers
                 new TokenValidationParameters
                 {
                     ValidateIssuer = false,
-                    ValidAudience = "localhost",
-                    IssuerSigningKey = new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(secretKeyHash))),
+                    ValidAudience = jwtSettings.Audiences[0],
+                    IssuerSigningKey = new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(jwtSettings.SecretKeyHash))),
                     ClockSkew = TimeSpan.FromSeconds(0),
                     RequireExpirationTime = true,
                     RequireSignedTokens = true,
@@ -42,13 +34,13 @@ namespace Application.Handlers
             JwtSecurityTokenHandler tokenHandler = new();
             SecurityTokenDescriptor tokenDescriptor = new()
             {
-                Issuer = "localhost",
-                Audience = "localhost",
+                Issuer = jwtSettings.Audiences[0],
+                Audience = jwtSettings.Audiences[0],
                 IssuedAt = DateTime.UtcNow,
                 Subject = (ClaimsIdentity)claimsIdentity.Identity,
                 Expires = expirationDate,
                 SigningCredentials = new(
-                    new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(secretKeyHash))),
+                    new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(jwtSettings.SecretKeyHash))),
                     SecurityAlgorithms.HmacSha256Signature)
             };
 

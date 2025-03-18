@@ -6,46 +6,49 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Shared;
 
 namespace Infra.DI
 {
     public static class OpenTelemetryExtension
     {
-        public static IServiceCollection AddOpenTelemetryInstrumentation(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddOpenTelemetryInstrumentation(this IServiceCollection services)
         {
-            ArgumentNullException.ThrowIfNull(configuration);
+            OpentelemetrySettings settings = services.BuildServiceProvider().GetRequiredService<OpentelemetrySettings>();
+
+            ArgumentNullException.ThrowIfNull(settings);
 
             services.AddOpenTelemetry()
               .ConfigureResource(resource => resource.AddService(
-                      serviceName: configuration.GetValue("Instrumentation:ServiceName", string.Empty), 
-                      serviceVersion: configuration.GetValue("Instrumentation:ServiceVersion", string.Empty))
+                      serviceName: settings.ServiceName,
+                      serviceVersion: settings.ServiceVersion)
                  .AddAttributes(
                      new Dictionary<string, object>
                      {
-                         { "environnment" , configuration.GetValue("ASPCORE_ENVIRONMENT", string.Empty) },
+                         { "environnment" , settings.Environment },
                      }
                  .AsEnumerable()))
               .WithTracing(tracing => tracing.AddAspNetCoreInstrumentation()
                   .AddConsoleExporter()
-                  .AddOtlpExporter(cfg => cfg.Endpoint = new Uri(configuration.GetValue("Instrumentation:Uri", string.Empty))))
+                  .AddOtlpExporter(cfg => cfg.Endpoint = new Uri(settings.Uri)))
               .WithMetrics(metrics => metrics.AddAspNetCoreInstrumentation()
                   .AddConsoleExporter()
-                  .AddOtlpExporter(cfg => cfg.Endpoint = new Uri(configuration.GetValue("Instrumentation:Uri", string.Empty))));
+                  .AddOtlpExporter(cfg => cfg.Endpoint = new Uri(settings.Uri)));
 
             return services;
         }
 
         public static IHostApplicationBuilder AddOpenTelemetryLogger(this IHostApplicationBuilder builder)
         {
+            OpentelemetrySettings settings = builder.Services.BuildServiceProvider().GetRequiredService<OpentelemetrySettings>();
+
             builder.Logging.AddOpenTelemetry(options => options.SetResourceBuilder(ResourceBuilder
                 .CreateDefault()
                 .AddService(
-                    serviceName: builder.Configuration
-                    .GetValue("Instrumentation:ServiceName", string.Empty),
-                    serviceVersion: builder.Configuration
-                    .GetValue("Instrumentation:ServiceVersion", string.Empty)))
+                    serviceName: settings.ServiceName,
+                    serviceVersion: settings.ServiceVersion))
             .AddConsoleExporter()
-            .AddOtlpExporter(cfg => cfg.Endpoint = new Uri(builder.Configuration.GetValue("Instrumentation:Uri", string.Empty))));
+            .AddOtlpExporter(cfg => cfg.Endpoint = new Uri(settings.Uri)));
 
             return builder;
         }

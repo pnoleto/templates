@@ -1,17 +1,19 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Shared;
 
 namespace Infra.DI
 {
     public static class CorsExtension
     {
-        public static IServiceCollection AddCorsDefinitions(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddCorsDefinitions(this IServiceCollection services)
         {
+            CorsSettings settings = services.BuildServiceProvider().GetRequiredService<CorsSettings>();
+
             return services.AddCors(cors =>
                 cors.AddDefaultPolicy(policy =>
-                    policy.WithHeaders(configuration.GetRequiredSection("Cors:Headers").Get<string[]>() ?? [])
-                        .WithOrigins(configuration.GetRequiredSection("Cors:Origins").Get<string[]>() ?? [])
-                        .WithMethods(configuration.GetRequiredSection("Cors:Methods").Get<string[]>() ?? [])));
+                    policy.WithHeaders(settings.Headers)
+                        .WithOrigins(settings.Origins)
+                        .WithMethods(settings.Methods)));
         }
     }
 }

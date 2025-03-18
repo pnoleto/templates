@@ -1,6 +1,4 @@
-using HealthChecks.UI.Client;
 using Infra.DI;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 internal class Program
 {
@@ -8,18 +6,19 @@ internal class Program
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+        builder.AddConfigurationItems();
         builder.AddOpenTelemetryLogger();
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer()
              .AddSwaggerDefinitions(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name)
              //.ExecuteMigrationsOnStartup(builder.Configuration, "LocaDb")
              .AddSqlServerDbContext(builder.Configuration, "LocaDb")
-             .AddOpenTelemetryInstrumentation(builder.Configuration)
-             .AddCorsDefinitions(builder.Configuration)
              .AddHangFireSchedulerWithInMemoryDb()
-             .AddJwtDefinitions(builder)
+             .AddOpenTelemetryInstrumentation()
              .AddHttpCLientFactory()
              .AddExceptionHandler()
+             .AddCorsDefinitions()
+             .AddJwtDefinitions()
              .AddScheduledJobs()
              .AddHealthCheckUI()
              .AddRepositories()

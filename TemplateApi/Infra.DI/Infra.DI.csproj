@@ -48,6 +48,7 @@
     <ProjectReference Include="..\Infra.Database\Infra.Database.csproj" />
     <ProjectReference Include="..\Infra.Integrations\Infra.Integrations.csproj" />
     <ProjectReference Include="..\Infra.Migrations\Infra.Migrations.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
 </Project>

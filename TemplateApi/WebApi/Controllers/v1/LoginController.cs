@@ -3,6 +3,7 @@ using Asp.Versioning;
 using Application.Events;
 using Application.Results;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers.v1
 {
@@ -14,11 +15,11 @@ namespace WebApi.Controllers.v1
     /// <response code="200">OK</response>
     /// <response code="401">Forbbiden Resource</response>
     /// <response code="500">Internal Server Error</response>
-    [ControllerName("Login")]
+    [AllowAnonymous, ControllerName("Login")]
     public class LoginController(IMediator mediator, ILogger<SourceController> logger): BaseController(mediator, logger)
     {
         /// <summary>
-
+        /// 
         /// </summary>
         /// <param name="loginEvent"></param>
         /// <returns></returns>
