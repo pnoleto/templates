@@ -18,6 +18,14 @@ namespace Infra.DI
         ILoggerFactory logger,
         UrlEncoder encoder) : AuthenticationHandler<ApiKeyAuthenticationSchemeOptions>(options, logger, encoder)
     {
+        private ClaimsPrincipal UserIdentity(bool isAdmin = false)
+        {
+            return new(new ClaimsIdentity([
+                    new(ClaimTypes.Sid, Guid.NewGuid().ToString()),
+                    new(ClaimTypes.Role, isAdmin? "Admin": "User"),
+                    new(ClaimTypes.Expiration, DateTime.Now.AddDays(10).ToString("s"))
+                ], Scheme.Name));
+        }
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             string apikey = Context.Request.Headers["x-api-key"].ToString();
@@ -33,18 +41,12 @@ namespace Infra.DI
             return Task.FromResult(AuthenticateResult.Success(ticket));
         }
 
-        private ClaimsPrincipal UserIdentity(bool isAdmin = false)
-        {
-            return new(new ClaimsIdentity([
-                    new(ClaimTypes.Sid, Guid.NewGuid().ToString()),
-                    new(ClaimTypes.Role, isAdmin? "Admin": "User"),
-                    new(ClaimTypes.Expiration, DateTime.Now.AddDays(10).ToString("s"))
-                ], Scheme.Name));
-        }
     }
 
     public static class ApiKeyAuthenticationExtension
     {
+        private const string ApiKeyScheme = "ApiKey";
+
         public static IServiceCollection AddApiKeyAuthentication(this IServiceCollection services)
         {
             IConfiguration configuration = services.BuildServiceProvider()
@@ -54,13 +56,13 @@ namespace Infra.DI
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("ApiKey", policy =>
+                options.AddPolicy(ApiKeyScheme, policy =>
                 {
-                    policy.AddAuthenticationSchemes("ApiKey")
+                    policy.AddAuthenticationSchemes(ApiKeyScheme)
                     .RequireAuthenticatedUser();
                 });
-            }).AddAuthentication("ApiKey")
-                .AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationSchemeHandler>("ApiKey", options =>
+            }).AddAuthentication(ApiKeyScheme)
+                .AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationSchemeHandler>(ApiKeyScheme, options =>
                 {
                     options.ApiKeys = configuration?.GetSection("ApiKeys")?.Get<string[]>() ?? [];
                 });

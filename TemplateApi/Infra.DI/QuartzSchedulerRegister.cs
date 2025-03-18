@@ -1,10 +1,20 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Infra.Robots;
 using Quartz;
 
 namespace Infra.DI
 {
-    public static class QuartzSchedulerRegister
+    public static partial class QuartzSchedulerRegister
     {
+        private static ITriggerConfigurator LoadDefaultSettings(this ITriggerConfigurator trigger)
+        {
+            return trigger.StartNow()
+                          .WithIdentity(nameof(Job.Execute))
+                          .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(7)))
+                          .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromMinutes(30)).RepeatForever())
+                          .WithDescription("Feed job responsible for news feed consume");
+        }
+
         public static IServiceCollection AddQuartzScheduler(this IServiceCollection services) => services
             .Configure<QuartzOptions>(options =>
             {
@@ -15,21 +25,11 @@ namespace Infra.DI
             {
                 options.UseSimpleTypeLoader();
                 options.UseInMemoryStore();
-                options.UseDefaultThreadPool(TTL =>
-                {
-                    TTL.MaxConcurrency = 10;
-                });
-                //options.ScheduleJob<FeedsJob>(trigger =>
-                //trigger.StartNow()
-                //  .WithIdentity(nameof(FeedsJob))
-                //  .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(7)))
-                //  .WithSimpleSchedule(x => x.WithInterval(TimeSpan.FromMinutes(30)).RepeatForever())
-                //  .WithDescription("Feed job responsible for news feed consume"));
+                options.UseDefaultThreadPool(TTL => TTL.MaxConcurrency = 10);
+                options.ScheduleJob<Job>(trigger => trigger.LoadDefaultSettings());
             })
-            .AddQuartzHostedService(options =>
-            {
-                options.WaitForJobsToComplete = true;
-            })
+            .AddQuartzHostedService(options => options.WaitForJobsToComplete = true)
             .AddScheduledJobs();
+
     }
 }

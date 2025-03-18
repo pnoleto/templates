@@ -10,26 +10,32 @@ namespace Infra.DI
     {
         private const string DefaultScheme = "JwtScheme";
 
+        private static TokenValidationParameters LoadJwtSettings(this JwtSettings settings)
+        {
+            return new()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(settings.SecretKeyHash))),
+                ValidAudiences = settings.Audiences,
+                ValidIssuers = settings.Issuers,
+                ClockSkew = TimeSpan.FromSeconds(0)
+            };
+        }
+
         public static IServiceCollection AddJwtDefinitions(this IServiceCollection services)
         {
-            JwtSettings settings = services.BuildServiceProvider().GetRequiredService<JwtSettings>();
+            JwtSettings settings = services.BuildServiceProvider()
+                .GetRequiredService<JwtSettings>();
 
             ArgumentNullException.ThrowIfNull(settings);
 
             services.AddAuthentication(DefaultScheme)
             .AddJwtBearer(DefaultScheme, jwtOptions =>
             {
-                jwtOptions.Audience =settings.Audiences[0];
-                jwtOptions.TokenValidationParameters = new()
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(settings.SecretKeyHash))),
-                    ValidAudiences = settings.Audiences,
-                    ValidIssuers = settings.Issuers,
-                    ClockSkew = TimeSpan.FromSeconds(0)
-                };
+                jwtOptions.Audience = settings.Audiences[0];
+                jwtOptions.TokenValidationParameters = settings.LoadJwtSettings();
                 jwtOptions.MapInboundClaims = false;
             });
 
@@ -40,6 +46,5 @@ namespace Infra.DI
 
             return services;
         }
-
     }
 }

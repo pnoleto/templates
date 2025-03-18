@@ -9,34 +9,12 @@ namespace Infra.DI
 {
     public static class SwaggerExtension
     {
-        public static IServiceCollection AddSwaggerDefinitions(this IServiceCollection services, string? xmlDocumentName)
-        {
-            return services.AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions(xmlDocumentName)
-                .AddApiExplorerWithVersioning();
-        }
-        private static IServiceCollection AddSwaggerApiVersionsGeneratorWithApiKeyDefinitions(this IServiceCollection services, string? xmlDocumentName)
-        {
-            return services.AddSwaggerGen(options =>
-            {
-                IApiVersionDescriptionProvider? provider = services.BuildServiceProvider()
-                .GetRequiredService<IApiVersionDescriptionProvider>();
-
-                foreach (ApiVersionDescription apiVersion in provider.ApiVersionDescriptions)
-                {
-                    options.AddSwaggerDocument(apiVersion);
-                }
-
-                if (!string.IsNullOrEmpty(xmlDocumentName))
-                    options.LoadXmlDocument(xmlDocumentName);
-            });
-        }
-
         private static SwaggerGenOptions LoadXmlDocument(this SwaggerGenOptions options, string? xmlDocumentName)
         {
             string xmlExtension = ".xml";
 
             string xmlPath = $"{new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName}/{xmlDocumentName}{xmlExtension}";
-            
+
             options.IncludeXmlComments(xmlPath);
 
             return options;
@@ -67,6 +45,29 @@ namespace Infra.DI
             });
 
             return services;
+        }
+
+        private static IServiceCollection AddSwaggerApiVersionsGenerator(this IServiceCollection services, string? xmlDocumentName)
+        {
+            return services.AddSwaggerGen(options =>
+            {
+                IApiVersionDescriptionProvider? provider = services.BuildServiceProvider()
+                .GetRequiredService<IApiVersionDescriptionProvider>();
+
+                foreach (ApiVersionDescription apiVersion in provider.ApiVersionDescriptions)
+                {
+                    options.AddSwaggerDocument(apiVersion);
+                }
+
+                if (!string.IsNullOrEmpty(xmlDocumentName))
+                    options.LoadXmlDocument(xmlDocumentName);
+            });
+        }
+
+        public static IServiceCollection AddSwaggerDefinitions(this IServiceCollection services, string? xmlDocumentName)
+        {
+            return services.AddSwaggerApiVersionsGenerator(xmlDocumentName)
+                .AddApiExplorerWithVersioning();
         }
 
         public static IApplicationBuilder UseSwaggerDefinitions(this IApplicationBuilder builder) =>
