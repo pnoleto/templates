@@ -11,8 +11,8 @@ internal class Program
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer()
              .AddSwaggerDefinitions(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name)
-             .ExecuteMigrationsOnStartup(builder.Configuration, "NewConnection")
-             .AddSqlServerDbContext(builder.Configuration, "NewConnection")
+             //.ExecuteMigrationsOnStartup(builder.Configuration, "NewsConnection")
+             .AddSqlServerDbContext(builder.Configuration, "NewsConnection")
              .AddHangFireSchedulerWithInMemoryDb()
              .AddOpenTelemetryInstrumentation()
              .AddHttpCLientFactory()
@@ -28,7 +28,7 @@ internal class Program
              .AddLogging();
 
         builder.Services.AddHealthChecks()
-            .CheckSqlServer(builder.Configuration, "NewConnection")
+            .CheckSqlServer(builder.Configuration, "NewsConnection")
             .CheckSystem();
 
         WebApplication app = builder.Build();
