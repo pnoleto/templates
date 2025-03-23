@@ -79,7 +79,6 @@ namespace Infra.DI
 
                     context.ProblemDetails.Extensions.TryAdd("traceId", activity?.Id);
                 };
-            })
-            .AddExceptionHandler<CustomExceptionHandler>();
+            }).AddExceptionHandler<CustomExceptionHandler>();
     }
 }

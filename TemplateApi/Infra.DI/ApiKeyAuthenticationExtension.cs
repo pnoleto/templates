@@ -26,6 +26,7 @@ namespace Infra.DI
                     new(ClaimTypes.Expiration, DateTime.Now.AddDays(10).ToString("s"))
                 ], Scheme.Name));
         }
+
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             string apikey = Context.Request.Headers["x-api-key"].ToString();
@@ -47,7 +48,7 @@ namespace Infra.DI
     {
         private const string ApiKeyScheme = "ApiKey";
 
-        public static IServiceCollection AddApiKeyAuthentication(this IServiceCollection services)
+        public static IServiceCollection AddApiKeyDefinition(this IServiceCollection services)
         {
             IConfiguration configuration = services.BuildServiceProvider()
                 .GetRequiredService<IConfiguration>();

@@ -19,7 +19,6 @@ namespace WebApi.Controllers.v1
     public class LoginController(IMediator mediator, ILogger<SourceController> logger): BaseController
     {
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="loginEvent"></param>
         /// <returns></returns>

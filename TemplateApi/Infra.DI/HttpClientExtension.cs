@@ -1,5 +1,5 @@
-﻿using Infra.Integrations;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Infra.Integrations;
 using Refit;
 
 namespace Infra.DI
@@ -11,6 +11,8 @@ namespace Infra.DI
             services.AddRefitClient<IGoogleClient>()
             .ConfigureHttpClient(options =>
             {
+                options.DefaultRequestHeaders.Add("Content-Type", ["text/html", "text/html"]);
+                options.DefaultRequestHeaders.Add("Authorization", "Bearer {MY_TOKEN}");
                 options.BaseAddress = new Uri("https://www.google.com");
                 options.Timeout = TimeSpan.FromSeconds(30);
             });
@@ -18,4 +20,5 @@ namespace Infra.DI
             return services;
         }
     }
+
 }

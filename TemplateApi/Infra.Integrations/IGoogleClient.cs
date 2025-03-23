@@ -2,7 +2,7 @@
 
 namespace Infra.Integrations
 {
-    [Headers("Content-Type: text/html", "Content-Type: application/json")]
+    [Headers()]
     public interface IGoogleClient
     {
         [Get("/")]
@@ -10,6 +10,9 @@ namespace Infra.Integrations
 
         [Post("/")]
         public Task Post();
+
+        [Patch("/{id}")]
+        public Task Patch(int id);
 
         [Put("/{id}")]
         public Task Put( int id);

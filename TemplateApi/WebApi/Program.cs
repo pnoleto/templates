@@ -1,4 +1,5 @@
 using Infra.DI;
+using System.Reflection;
 
 internal class Program
 {
@@ -10,7 +11,7 @@ internal class Program
         builder.AddOpenTelemetryLogger();
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer()
-             .AddSwaggerDefinitions(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name)
+             .AddSwaggerDefinitions(Assembly.GetExecutingAssembly().GetName().Name)
              //.ExecuteMigrationsOnStartup(builder.Configuration, "NewsConnection")
              .AddSqlServerDbContext(builder.Configuration, "NewsConnection")
              .AddHangFireSchedulerWithInMemoryDb()

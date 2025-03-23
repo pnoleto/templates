@@ -35,6 +35,7 @@ namespace Infra.DI
 
             return services;
         }
+
         public static IServiceCollection AddInMemoryDbContext(this IServiceCollection services) =>
             services.AddDbContext<NewsDbContext>(cfg => cfg.UseInMemoryDatabase(Guid.NewGuid().ToString()));
     }
