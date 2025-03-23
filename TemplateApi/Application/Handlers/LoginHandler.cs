@@ -12,6 +12,11 @@ namespace Application.Handlers
 {
     public class LoginHandler(JwtSettings jwtSettings) : IRequestHandler<LoginEvent, LoginResult>, IRequestHandler<RenewAccessTokenEvent, LoginResult>{
 
+        private byte[] GetKey()
+        {
+            return SHA256.HashData(Encoding.UTF8.GetBytes(jwtSettings.SecretKeyHash));
+        }
+
         private ClaimsPrincipal ValidateToken(RenewAccessTokenEvent request, JwtSecurityTokenHandler tokenHandler)
         {
             return tokenHandler.ValidateToken(
@@ -20,7 +25,7 @@ namespace Application.Handlers
                 {
                     ValidateIssuer = false,
                     ValidAudience = jwtSettings.Audiences[0],
-                    IssuerSigningKey = new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(jwtSettings.SecretKeyHash))),
+                    IssuerSigningKey = new SymmetricSecurityKey(GetKey()),
                     ClockSkew = TimeSpan.FromSeconds(0),
                     RequireExpirationTime = true,
                     RequireSignedTokens = true,
@@ -42,7 +47,7 @@ namespace Application.Handlers
                 Subject = (ClaimsIdentity)claimsIdentity.Identity,
                 Expires = expirationDate,
                 SigningCredentials = new(
-                    new SymmetricSecurityKey(SHA256.HashData(Encoding.Default.GetBytes(jwtSettings.SecretKeyHash))),
+                    new SymmetricSecurityKey(GetKey()),
                     SecurityAlgorithms.HmacSha256Signature)
             };
 

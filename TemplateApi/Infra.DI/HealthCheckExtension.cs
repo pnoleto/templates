@@ -1,11 +1,11 @@
-﻿using HealthChecks.ApplicationStatus.DependencyInjection;
-using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+﻿using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.ApplicationStatus.DependencyInjection;
 
 namespace Infra.DI
 {
@@ -31,8 +31,8 @@ namespace Infra.DI
 
         public static IHealthChecksBuilder CheckSystem(this IHealthChecksBuilder builder)
         {
-            return builder.AddDiskStorageHealthCheck(options => options
-             .WithCheckAllDrives(), name: "disk_storage")
+            return builder.AddDiskStorageHealthCheck(options => 
+            options.WithCheckAllDrives(), name: "disk_storage")
                 .AddApplicationStatus(name: "application");
         }
 
