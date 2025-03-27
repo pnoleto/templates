@@ -15,7 +15,7 @@ namespace WebApi.Controllers.v1
     /// <response code="401">Forbbiden Resource</response>
     /// <response code="500">Internal Server Error</response>
     [ControllerName("top-headlines")]
-    public class TopHeadlinesController(IMediator mediator, ILogger<SourceController> logger) : ControllerBase
+    public class TopHeadlinesController(IMediator mediator, ILogger<SourceController> logger) : ApiController
     {
         /// <summary>
         /// GEt Top headlines
