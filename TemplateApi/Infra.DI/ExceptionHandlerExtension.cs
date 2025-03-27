@@ -14,13 +14,9 @@ namespace Infra.DI
     {
         private static Dictionary<string, object?> LoadRequestHeaders(HttpContext httpContext)
         {
-            Dictionary<string, object?> headers = httpContext.Request.Headers
+           return httpContext.Request.Headers
                 .Select(item => ((string)item.Key, (object?)item.Value))
                 .ToDictionary();
-
-            headers.Add("datetime", DateTime.Now.ToString("G"));
-
-            return headers;
         }
 
         private static ProblemDetailsContext GetProblemDetailsContext(HttpContext httpContext, Exception exception, int responseCode)
@@ -61,22 +57,17 @@ namespace Infra.DI
 
     public static class ExceptionHandlerExtension
     {
-        private static string GetRequestPath(ProblemDetailsContext context)
-        {
-            return $"{context.HttpContext.Request.Method} {context.HttpContext.Request.Path}";
-        }
-
         public static IServiceCollection AddExceptionHandler(this IServiceCollection services) => services
             .AddProblemDetails(options =>
             {
                 options.CustomizeProblemDetails = context =>
                 {
-                    context.ProblemDetails.Instance = GetRequestPath(context);
-
-                    context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
-
                     Activity? activity = context.HttpContext.Features.Get<IHttpActivityFeature>()?.Activity;
 
+                    context.ProblemDetails.Extensions.TryAdd("Method", context.HttpContext.Request.Method);
+                    context.ProblemDetails.Extensions.TryAdd("Path", context.HttpContext.Request.Path);
+                    context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
+                    context.ProblemDetails.Extensions.TryAdd("datetime", DateTime.UtcNow);
                     context.ProblemDetails.Extensions.TryAdd("traceId", activity?.Id);
                 };
             }).AddExceptionHandler<CustomExceptionHandler>();

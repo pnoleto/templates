@@ -33,7 +33,7 @@ namespace Infra.DI
 
                 IList<string> migrations = [..connection.Database.GetPendingMigrations()];
 
-                if (connection.Database.GetPendingMigrations().Any()) connection.Database.Migrate();
+                if (migrations.Any()) connection.Database.Migrate();
             }
 
             return services;

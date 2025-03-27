@@ -12,7 +12,7 @@ internal class Program
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer()
              .AddSwaggerDefinitions(Assembly.GetExecutingAssembly().GetName().Name)
-             //.ExecuteMigrationsOnStartup(builder.Configuration, "NewsConnection")
+             .ExecuteMigrationsOnStartup(builder.Configuration, "NewsConnection")
              .AddSqlServerDbContext(builder.Configuration, "NewsConnection")
              .AddHangFireSchedulerWithInMemoryDb()
              .AddOpenTelemetryInstrumentation()
