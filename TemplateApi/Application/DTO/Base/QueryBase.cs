@@ -2,8 +2,8 @@
 {
     public class QueryBase: PagingBase
     {
-        public string Q { get; set; } = string.Empty;
-        public string Source { get; set; } = string.Empty;
+        public string? Q { get; set; }
+        public string? Source { get; set; }
     }
 
 }

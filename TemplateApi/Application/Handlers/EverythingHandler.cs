@@ -9,7 +9,9 @@ using Application.Handlers.Base;
 
 namespace Application.Handlers
 {
-    public class EverythingHandler(ISelectRepositoryBase<Article> selectRepository) : BaseValidationHandler<EverythingQuery>, IRequestHandler<EverythingEvent, ArticleResult>
+    public class EverythingHandler(ISelectRepositoryBase<Article> selectRepository) : 
+        ValidationHandlerBase<EverythingQuery>, 
+        IRequestHandler<EverythingEvent, ArticleResult>
     {
         public Task<ArticleResult> Handle(EverythingEvent request, CancellationToken cancellationToken)
         {
@@ -19,7 +21,7 @@ namespace Application.Handlers
 
                 IQueryable<Article> query = selectRepository.GetQueryable();
 
-                if (!string.IsNullOrEmpty(request.QInTitle)) query = query.Where(x => x.Title.Contains(request.Source));
+                if (!string.IsNullOrEmpty(request.QInTitle)) query = query.Where(x => x.Title.Contains(request.QInTitle));
 
                 if (!string.IsNullOrEmpty(request.Q)) query = query.Where(x => x.Title.Contains(request.Q) || x.Description.Contains(request.Q) || x.Content.Contains(request.Q));
 

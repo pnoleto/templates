@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Shared;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -43,6 +44,8 @@ namespace Infra.DI
              .AddPolicy(DefaultScheme, policy =>
                  policy.AddAuthenticationSchemes(DefaultScheme)
                  .RequireAuthenticatedUser());
+
+            services.AddScoped<JwtSecurityTokenHandler>();
 
             return services;
         }

@@ -8,7 +8,9 @@ using Application.Handlers.Base;
 
 namespace Application.Handlers
 {
-    public class TopHeadlinesHandler(ISelectRepositoryBase<Article> selectRepository) : BaseValidationHandler<TopHeadlinesEvent>, IRequestHandler<TopHeadlinesEvent, ArticleResult>
+    public class TopHeadlinesHandler(ISelectRepositoryBase<Article> selectRepository) : 
+        ValidationHandlerBase<TopHeadlinesEvent>, 
+        IRequestHandler<TopHeadlinesEvent, ArticleResult>
     {
         public Task<ArticleResult> Handle(TopHeadlinesEvent request, CancellationToken cancellationToken)
         {

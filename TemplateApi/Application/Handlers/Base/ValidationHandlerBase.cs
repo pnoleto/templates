@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace Application.Handlers.Base
 {
-    public class BaseValidationHandler<T> : AbstractValidator<T> where T: PagingBase
+    public class ValidationHandlerBase<T> : AbstractValidator<T> where T: PagingBase
     {
-        public BaseValidationHandler()
+        public ValidationHandlerBase()
         {
             RuleLevelCascadeMode = CascadeMode.Continue;
 
