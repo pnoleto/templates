@@ -9,7 +9,7 @@ using Application.Handlers.Base;
 namespace Application.Handlers
 {
     public class SourceHandler(ISelectRepositoryBase<Source> selectRepository) : 
-        ValidationHandlerBase<SourceEvent>, 
+        HandlerBase<SourceEvent>, 
         IRequestHandler<SourceEvent, SourceResult>
     {
         public Task<SourceResult> Handle(SourceEvent request, CancellationToken cancellationToken)

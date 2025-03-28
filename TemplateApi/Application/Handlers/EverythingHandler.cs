@@ -10,7 +10,7 @@ using Application.Handlers.Base;
 namespace Application.Handlers
 {
     public class EverythingHandler(ISelectRepositoryBase<Article> selectRepository) : 
-        ValidationHandlerBase<EverythingQuery>, 
+        HandlerBase<EverythingQuery>, 
         IRequestHandler<EverythingEvent, ArticleResult>
     {
         public Task<ArticleResult> Handle(EverythingEvent request, CancellationToken cancellationToken)

@@ -9,10 +9,18 @@ using FluentValidation;
 
 namespace Application.Handlers.Base
 {
-    public abstract class LoginHandlerBase<T>(JwtSettings jwtSettings, JwtSecurityTokenHandler tokenHandler) : AbstractValidator<T> where T : class
+    public abstract class LoginHandlerBase<T> : AbstractValidator<T> where T : class
     {
-        private readonly JwtSettings jwtSettings = jwtSettings;
-        private readonly JwtSecurityTokenHandler tokenHandler = tokenHandler;
+        private readonly JwtSettings jwtSettings;
+        private readonly JwtSecurityTokenHandler tokenHandler;
+
+        public LoginHandlerBase(JwtSettings jwtSettings, JwtSecurityTokenHandler tokenHandler)
+        {
+            this.jwtSettings = jwtSettings;
+            this.tokenHandler = tokenHandler;
+
+            ClassLevelCascadeMode = CascadeMode.Continue;
+        }
 
         private protected byte[] GetKey()
         {

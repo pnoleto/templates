@@ -5,15 +5,25 @@ using Application.Results;
 using Application.Events;
 using Shared;
 using Application.Handlers.Base;
+using FluentValidation;
 
 namespace Application.Handlers
 {
-    public class RenewAccesTokenHandler(JwtSettings jwtSettings, JwtSecurityTokenHandler tokenHandler) :
-        LoginHandlerBase<RenewAccessTokenEvent>(jwtSettings, tokenHandler),
+    public class RenewAccesTokenHandler :
+        LoginHandlerBase<RenewAccessTokenEvent>,
         IRequestHandler<RenewAccessTokenEvent, LoginResult>{
+        public RenewAccesTokenHandler(JwtSettings jwtSettings, JwtSecurityTokenHandler tokenHandler) : base(jwtSettings, tokenHandler)
+        {
+            RuleFor(entity => entity.RefreshToken)
+                .NotNull()
+                .NotEmpty()
+                .MinimumLength(3);
+        }
 
         public async Task<LoginResult> Handle(RenewAccessTokenEvent request, CancellationToken cancellationToken)
         {
+            await this.ValidateAndThrowAsync(request, cancellationToken);
+
             ClaimsPrincipal claims = ValidateToken(request);
 
             return new LoginResult
