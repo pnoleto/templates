@@ -18,7 +18,7 @@ namespace WebApi.Controllers.v1
     public class TopHeadlinesController(IMediator mediator, ILogger<SourceController> logger) : ApiController
     {
         /// <summary>
-        /// GEt Top headlines
+        /// Get Top headlines
         /// </summary>
         /// <param name="sourceEvent"></param>
         /// <returns></returns>
