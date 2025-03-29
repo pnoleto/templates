@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infra.Migrations.Migrations
 {
     [DbContext(typeof(MigrationsDbContext))]
-    [Migration("20250329140948_SourceAddSku")]
-    partial class SourceAddSku
+    [Migration("20250329144305_CreateDatabase")]
+    partial class CreateDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -171,10 +171,6 @@ namespace Infra.Migrations.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SKU")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
