@@ -1,56 +1,59 @@
 using Infra.DI;
 using System.Reflection;
 
-internal class Program
+namespace WebApi
 {
-    private static void Main(string[] args)
+    static class Program
     {
-        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+        private static void Main(string[] args)
+        {
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        builder.AddConfigurationItems();
-        builder.AddOpenTelemetryLogger();
-        builder.Services.AddControllers();
-        builder.Services.AddEndpointsApiExplorer()
-             .AddSwaggerDefinitions(Assembly.GetExecutingAssembly().GetName().Name)
-             .ExecuteMigrationsOnStartup(builder.Configuration, "NewsConnection")
-             .AddSqlServerDbContext(builder.Configuration, "NewsConnection")
-             .AddHangFireSchedulerWithInMemoryDb()
-             .AddOpenTelemetryInstrumentation()
-             .AddHttpCLientFactory()
-             .AddExceptionHandler()
-             .AddCorsDefinitions()
-             .AddJwtDefinitions()
-             .AddScheduledJobs()
-             .AddHealthCheckUI()
-             .AddRepositories()
-             .AddHttpClient()
-             .AddFeedRobots()
-             .AddMediator()
-             .AddLogging();
+            builder.AddConfigurationItems();
+            builder.AddOpenTelemetryLogger();
+            builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer()
+                 .AddSwaggerDefinitions(Assembly.GetExecutingAssembly().GetName().Name)
+                 //.ExecuteMigrationsOnStartup(builder.Configuration, "NewsConnection")
+                 .AddSqlServerDbContext(builder.Configuration, "NewsConnection")
+                 .AddHttpCLientFactory(builder.Configuration)
+                 .AddHangFireSchedulerWithInMemoryDb()
+                 .AddOpenTelemetryInstrumentation()
+                 .AddExceptionHandler()
+                 .AddCorsDefinitions()
+                 .AddJwtDefinitions()
+                 .AddScheduledJobs()
+                 .AddHealthCheckUI()
+                 .AddRepositories()
+                 .AddHttpClient()
+                 .AddFeedRobots()
+                 .AddMediator()
+                 .AddLogging();
 
-        builder.Services.AddHealthChecks()
-            .CheckSqlServer(builder.Configuration, "NewsConnection")
-            .CheckSystem();
+            builder.Services.AddHealthChecks()
+                .CheckSqlServer(builder.Configuration, "NewsConnection")
+                .CheckSystem();
 
-        WebApplication app = builder.Build();
+            WebApplication app = builder.Build();
 
-        app.UseRouting()
-            .UseAuthentication()
-            .UseAuthorization()
-            .UseHealthCheckEndpoint();
+            app.UseRouting()
+                .UseAuthentication()
+                .UseAuthorization()
+                .UseHealthCheckEndpoint();
 
-        if (app.Environment.IsDevelopment())
-            app.UseHealthChecksUI()
-                .UseSwaggerDefinitions();
+            if (app.Environment.IsDevelopment())
+                app.UseHealthChecksUI()
+                    .UseSwaggerDefinitions();
 
-        app.UseProtectedHangFireDashboard()
-            .UseExceptionHandler()
-            .UseHttpsRedirection()
-            .UseScheduledJobs()
-            .UseCors()
-            .UseHsts();
+            app.UseProtectedHangFireDashboard()
+                .UseExceptionHandler()
+                .UseHttpsRedirection()
+                .UseScheduledJobs()
+                .UseCors()
+                .UseHsts();
 
-        app.MapControllers();
-        app.Run();
+            app.MapControllers();
+            app.Run();
+        }
     }
 }
