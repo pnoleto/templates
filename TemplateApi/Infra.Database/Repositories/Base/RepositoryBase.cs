@@ -10,18 +10,18 @@ namespace Infra.Database.Repositories.Base
         private IDbContextTransaction? _transaction;
         private readonly NewsDbContext _dbContext = dbContext;
 
-        public T Add(T modelBase)
+        public T Add(T entity)
         {
-            var entity = _dbContext.Add(modelBase).Entity;
+            var insertedEntity = _dbContext.Add(entity).Entity;
 
             _dbContext.SaveChanges();
 
-            return entity;
+            return insertedEntity;
         }
 
-        public void AddRange(IEnumerable<T> modelBases)
+        public void AddRange(IEnumerable<T> entities)
         {
-            _dbContext.AddRange(modelBases);
+            _dbContext.AddRange(entities);
 
             _dbContext.SaveChanges();
         }
@@ -35,9 +35,9 @@ namespace Infra.Database.Repositories.Base
             return updatedEntity;
         }
 
-        public void UpdateRange(IEnumerable<T> modelBases)
+        public void UpdateRange(IEnumerable<T> entities)
         {
-            _dbContext.UpdateRange(modelBases);
+            _dbContext.UpdateRange(entities);
 
             _dbContext.SaveChanges();
         }
@@ -51,9 +51,9 @@ namespace Infra.Database.Repositories.Base
             return updatedEntity;
         }
 
-        public void DeleteRange(IEnumerable<T> modelBases)
+        public void DeleteRange(IEnumerable<T> entities)
         {
-            _dbContext.RemoveRange(modelBases);
+            _dbContext.RemoveRange(entities);
 
             _dbContext.SaveChanges();
         }

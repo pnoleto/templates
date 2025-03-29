@@ -27,7 +27,7 @@ namespace Application.Handlers
 
                 if (!string.IsNullOrEmpty(request.Source)) query = query.Where(x => x.Source.Name.Contains(request.Source));
 
-                if (!string.IsNullOrEmpty(request.Language)) query = query.Where(x => x.Source.Feeds.Where(y => y.Language == request.Language).Any());
+                if (!string.IsNullOrEmpty(request.Language)) query = query.Where(x => x.Source.Feeds.Any(y => y.Language == request.Language));
 
                 if (request.From.HasValue) query = query.Where(x => x.PublishedAt >= request.From);
 

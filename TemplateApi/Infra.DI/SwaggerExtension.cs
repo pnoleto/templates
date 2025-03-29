@@ -74,9 +74,9 @@ namespace Infra.DI
                 {
                     IApiVersionDescriptionProvider provider = builder.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
 
-                    foreach (ApiVersionDescription item in provider.ApiVersionDescriptions)
+                    foreach (string groupName in provider.ApiVersionDescriptions.Select(item=> item.GroupName))
                     {
-                        options.SwaggerEndpoint($"/swagger/{item.GroupName}/swagger.json", item.GroupName.ToUpperInvariant());
+                        options.SwaggerEndpoint($"/swagger/{groupName}/swagger.json", groupName.ToUpperInvariant());
                     }
                 });
     }

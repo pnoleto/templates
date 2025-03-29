@@ -9,11 +9,6 @@ namespace Infra.Database.ModelDbContext
         public DbSet<Source> Sources { get; set; }
         public DbSet<Article> Articles { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

@@ -16,7 +16,7 @@ namespace Infra.DI
         private static Dictionary<string, object?> LoadRequestHeaders(HttpContext httpContext)
         {
             return httpContext.Request.Headers
-                 .Select(item => ((string)item.Key, (object?)item.Value))
+                 .Select(item => (item.Key, (object?)item.Value))
                  .ToDictionary();
         }
 
@@ -54,7 +54,7 @@ namespace Infra.DI
 
             ProblemDetailsContext problemDetailsContext = GetProblemDetailsContext(httpContext, exception, responseCode);
 
-            logger.LogError("An Error Has Ocurred, see the details: {problemDetail}", problemDetailsContext);
+            logger.LogError("An Error Has Ocurred, See The Details: {ProblemDetails}", problemDetailsContext);
 
             return problemDetailsService.TryWriteAsync(problemDetailsContext);
         }
