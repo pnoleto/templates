@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Infra.DI
 {
-    public static class ContextsExtension
+    public static class DbContextsExtension
     {
         private const int THIRTY_SECONDS = 30;
         private const int THREE_RETRIES = 3;

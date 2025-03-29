@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Infra.Database\Infra.Database.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
