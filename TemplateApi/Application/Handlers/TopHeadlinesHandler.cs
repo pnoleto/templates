@@ -24,13 +24,13 @@ namespace Application.Handlers
 
                 if (!string.IsNullOrEmpty(request.Q)) query = query.Where(x => x.Title.Contains(request.Q) || x.Description.Contains(request.Q) || x.Content.Contains(request.Q));
 
-                if (!string.IsNullOrEmpty(request.Category)) query = query.Where(x => x.Source.Feeds.Where(y=> string.Equals(y.Category, request.Category)).Any());
+                if (!string.IsNullOrEmpty(request.Category)) query = query.Where(x => x.Source.Feeds.Any(y => string.Equals(y.Category, request.Category)));
 
-                if (!string.IsNullOrEmpty(request.Country)) query = query.Where(x => x.Source.Feeds.Where(y => string.Equals(y.Country, request.Country)).Any());
+                if (!string.IsNullOrEmpty(request.Country)) query = query.Where(x => x.Source.Feeds.Any(y => string.Equals(y.Country, request.Country)));
 
                 if (!string.IsNullOrEmpty(request.Source)) query = query.Where(x => x.Source.Name.Contains(request.Source));
 
-                query = query.Where(x => x.Source.Name.Contains(request.Source)).OrderByDescending(x=> x.PublishedAt);
+                query = query.Where(x => x.Source.Name.Contains(request.Source)).OrderByDescending(x => x.PublishedAt);
 
                 return new ArticleResult
                 {

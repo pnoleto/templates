@@ -14,7 +14,7 @@ namespace Application.Handlers.Base
         private readonly JwtSettings jwtSettings;
         private readonly JwtSecurityTokenHandler tokenHandler;
 
-        public LoginHandlerBase(JwtSettings jwtSettings, JwtSecurityTokenHandler tokenHandler)
+        protected LoginHandlerBase(JwtSettings jwtSettings, JwtSecurityTokenHandler tokenHandler)
         {
             this.jwtSettings = jwtSettings;
             this.tokenHandler = tokenHandler;
@@ -27,7 +27,7 @@ namespace Application.Handlers.Base
             return SHA256.HashData(Encoding.UTF8.GetBytes(jwtSettings.SecretKeyHash));
         }
 
-        protected ClaimsPrincipal GenerateClaims(LoginEvent request)
+        protected static ClaimsPrincipal GenerateClaims(LoginEvent request)
         {
             return new ClaimsPrincipal(new ClaimsIdentity(
             [
@@ -57,7 +57,6 @@ namespace Application.Handlers.Base
         {
             ArgumentNullException.ThrowIfNull(claimsIdentity.Identity);
 
-            JwtSecurityTokenHandler tokenHandler = new();
             SecurityTokenDescriptor tokenDescriptor = new()
             {
                 Issuer = jwtSettings.Audiences[0],

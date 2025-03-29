@@ -1,6 +1,6 @@
 ﻿namespace Shared
 {
-    public class OpentelemetrySettings
+    public class OpentelemetrySettings: SettingsBase
     {
         public string Environment { get; set; } = string.Empty;
         public string ServiceName { get; set; } = string.Empty;
