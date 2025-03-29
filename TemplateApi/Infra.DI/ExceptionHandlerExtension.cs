@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Reflection;
 using FluentValidation;
 using System.Net;
+using Microsoft.Extensions.Logging;
 
 namespace Infra.DI
 {
@@ -14,9 +15,9 @@ namespace Infra.DI
     {
         private static Dictionary<string, object?> LoadRequestHeaders(HttpContext httpContext)
         {
-           return httpContext.Request.Headers
-                .Select(item => ((string)item.Key, (object?)item.Value))
-                .ToDictionary();
+            return httpContext.Request.Headers
+                 .Select(item => ((string)item.Key, (object?)item.Value))
+                 .ToDictionary();
         }
 
         private static ProblemDetailsContext GetProblemDetailsContext(HttpContext httpContext, Exception exception, int responseCode)
@@ -38,6 +39,8 @@ namespace Infra.DI
 
         public ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
+            var logger = httpContext.RequestServices.GetRequiredService<ILogger<CustomExceptionHandler>>();
+
             int responseCode = exception.GetType().Name switch
             {
                 nameof(ValidationException) => (int)HttpStatusCode.BadRequest,
@@ -50,6 +53,8 @@ namespace Infra.DI
             httpContext.Response.StatusCode = responseCode;
 
             ProblemDetailsContext problemDetailsContext = GetProblemDetailsContext(httpContext, exception, responseCode);
+
+            logger.LogError("An Error Has Ocurred, see the details: {problemDetail}", problemDetailsContext);
 
             return problemDetailsService.TryWriteAsync(problemDetailsContext);
         }

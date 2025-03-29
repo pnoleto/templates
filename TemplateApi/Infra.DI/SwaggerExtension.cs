@@ -55,9 +55,7 @@ namespace Infra.DI
                 .GetRequiredService<IApiVersionDescriptionProvider>();
 
                 foreach (ApiVersionDescription apiVersion in provider.ApiVersionDescriptions)
-                {
                     options.AddSwaggerDocument(apiVersion);
-                }
 
                 if (!string.IsNullOrEmpty(xmlDocumentName))
                     options.LoadXmlDocument(xmlDocumentName);

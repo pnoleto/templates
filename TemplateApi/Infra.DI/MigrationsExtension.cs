@@ -2,9 +2,8 @@
 using Infra.Migrations.ModelDbContext;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Infra.Migrations.Interfaces;
 using Infra.Migrations.Factories;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace Infra.DI
 {
@@ -16,7 +15,7 @@ namespace Infra.DI
 
             ArgumentNullException.ThrowIfNull(connectionStringName); 
 
-            services.AddSingleton<IMigrationsDbContextFactory, MigrationsDbContextFactory>();
+            services.AddSingleton<IDesignTimeDbContextFactory<MigrationsDbContext>, MigrationsDbContextFactory>();
 
             ServiceProvider serviceProvider = services.BuildServiceProvider();
 
@@ -28,9 +27,9 @@ namespace Infra.DI
 
                 ArgumentNullException.ThrowIfNull(connectionString);
 
-                IMigrationsDbContextFactory context = serviceProvider.GetRequiredService<IMigrationsDbContextFactory>();
+                IDesignTimeDbContextFactory<MigrationsDbContext> context = serviceProvider.GetRequiredService<IDesignTimeDbContextFactory<MigrationsDbContext>>();
 
-                MigrationsDbContext connection = context.CreateDbContext(connectionString);
+                MigrationsDbContext connection = context.CreateDbContext([connectionString]);
 
                 IList<string> migrations = [..connection.Database.GetPendingMigrations()];
 

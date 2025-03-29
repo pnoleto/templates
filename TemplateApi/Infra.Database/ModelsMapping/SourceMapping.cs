@@ -13,6 +13,7 @@ namespace Infra.Database.ModelsMapping
             builder.Property(entity => entity.Name).IsRequired();
             builder.Property(entity => entity.Url).IsRequired();
             builder.HasIndex(entity => entity.Url).IsUnique();
+            builder.Property(entity => entity.SKU).HasMaxLength(250).IsRequired();
 
             builder
               .HasMany(entity => entity.Articles)

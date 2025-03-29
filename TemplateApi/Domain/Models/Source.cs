@@ -9,5 +9,6 @@ namespace Domain.Models
         public string Url { get; set; } = string.Empty;
         public ICollection<Article> Articles { get; set; } = [];
         public ICollection<Feed> Feeds { get; set; } = [];
+        public string SKU { get; set; }
     }
 }

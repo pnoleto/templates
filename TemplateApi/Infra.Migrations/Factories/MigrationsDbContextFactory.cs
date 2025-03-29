@@ -1,13 +1,13 @@
-﻿using Infra.Migrations.Interfaces;
-using Infra.Migrations.ModelDbContext;
+﻿using Infra.Migrations.ModelDbContext;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace Infra.Migrations.Factories
 {
-    public sealed class MigrationsDbContextFactory : IMigrationsDbContextFactory
+    public sealed class MigrationsDbContextFactory : IDesignTimeDbContextFactory<MigrationsDbContext>
     {
-        public MigrationsDbContext CreateDbContext(string connectionString)
+        public MigrationsDbContext CreateDbContext(string[] args)
         {
-            return new MigrationsDbContext(DbContextOptionsFactory.SqlServerDefaultOptions(connectionString).Options);
+            return new MigrationsDbContext(DbContextOptionsFactory.SqlServerDefaultOptions(args[0]).Options);
         }
     }
 }
