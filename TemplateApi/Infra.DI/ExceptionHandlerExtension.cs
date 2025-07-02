@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.OpenApi.Extensions;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
 using System.Reflection;
@@ -29,7 +28,7 @@ namespace Infra.DI
                 ProblemDetails = new()
                 {
                     Status = responseCode,
-                    Title = ((HttpStatusCode)responseCode).GetDisplayName(),
+                    Title = ((HttpStatusCode)responseCode).ToString(),
                     Type = exception.GetType().Name,
                     Detail = exception.Message,
                     Extensions = LoadRequestHeaders(httpContext)

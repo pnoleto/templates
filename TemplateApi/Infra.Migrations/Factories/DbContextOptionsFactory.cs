@@ -6,16 +6,17 @@ namespace Infra.Migrations.Factories
 {
     internal static class DbContextOptionsFactory
     {
+        private const int MaxRetryCount = 3;
+        private const int MaxBatchSize = 5;
+
         public static DbContextOptionsBuilder<NewsDbContext> SqlServerDefaultOptions(string connectionString)
         {
-            ArgumentNullException.ThrowIfNull(nameof(connectionString));
-
             return new DbContextOptionsBuilder<NewsDbContext>()
                     .UseSqlServer(connectionString, options => options
                     .MigrationsAssembly(typeof(MigrationsDbContext).Assembly)
                     .MigrationsHistoryTable("Migrations")
-                    .EnableRetryOnFailure(3)
-                    .MaxBatchSize(5));
+                    .EnableRetryOnFailure(MaxRetryCount)
+                    .MaxBatchSize(MaxBatchSize));
         }
     }
 }

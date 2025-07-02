@@ -9,7 +9,7 @@ namespace Infra.DI
     {
         public static IServiceCollection AddHttpCLientFactory(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddRefitClient<IGoogleClient>()
+            services.AddRefitClient<IHttpClient>()
             .ConfigureHttpClient(options =>
             {
                 string[]? requiredHosts = configuration.GetRequiredSection("RequiredHosts").Get<string[]>();

@@ -3,7 +3,7 @@
 namespace Infra.Integrations
 {
     [Headers()]
-    public interface IGoogleClient
+    public interface IHttpClient
     {
         [Get("/")]
         public Task Get([Query] int? id = null);

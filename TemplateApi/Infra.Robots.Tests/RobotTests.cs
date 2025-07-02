@@ -16,7 +16,6 @@ namespace Infra.Robots.Tests
         {
             _serviceProvider = new ServiceCollection()
                 .AddRepositories()
-                .AddFeedRobots()
                 .AddInMemoryDbContext()
                 .BuildServiceProvider();
 

@@ -1,13 +1,12 @@
 ﻿using Domain.Models;
-using AutoMapper;
 
 namespace Application.Mapper.Profiles
 {
-    public class ArticleProfile: Profile
+    public class ArticleProfile
     {
         public ArticleProfile() 
         {
-            CreateMap<Article, Article>().ReverseMap();
+
         }  
     }
 }

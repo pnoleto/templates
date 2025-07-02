@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebApi.Controllers.v1
+namespace Template.Api.Controllers.v1
 {
     /// <summary>
     /// Base to develop all controller in the applciation

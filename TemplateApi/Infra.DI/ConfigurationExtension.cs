@@ -17,9 +17,7 @@ namespace Infra.DI
         public static IHostApplicationBuilder AddConfigurationItems(this IHostApplicationBuilder builder)
         {
             builder.Services
-            .AddSingleton(config => builder.Configuration.LoadConfig<CorsSettings>("Cors"))
-            .AddSingleton(config => builder.Configuration.LoadConfig<JwtSettings>("JwtSettings"))
-            .AddSingleton(config => builder.Configuration.LoadConfig<OpentelemetrySettings>("Instrumentation"));
+            .AddSingleton(config => builder.Configuration.LoadConfig<CorsSettings>("Cors"));
 
             return builder;
         }

@@ -38,19 +38,6 @@ namespace Infra.DI
             return builder;
         }
 
-        public static IServiceCollection AddHealthCheckUI(this IServiceCollection services)
-        {
-            services.AddHealthChecksUI(options =>
-            {
-                options.SetApiMaxActiveRequests(1);
-                options.SetEvaluationTimeInSeconds(10);
-                options.MaximumHistoryEntriesPerEndpoint(10);
-            })
-            .AddInMemoryStorage();
-
-            return services;
-        }
-
         public static IEndpointConventionBuilder UseHealthCheckEndpoint(this IEndpointRouteBuilder services)
         {
             return services.MapHealthChecks("/health", new HealthCheckOptions
@@ -64,14 +51,6 @@ namespace Infra.DI
                     [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable,
                 },
                 AllowCachingResponses = false
-            });
-        }
-
-        public static IEndpointConventionBuilder UseHealthCheckUIEndpoint(this IEndpointRouteBuilder services)
-        {
-            return services.MapHealthChecksUI(options =>
-            {
-                options.UIPath = "/health-ui";
             });
         }
     }
