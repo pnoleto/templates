@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.ApplicationStatus.DependencyInjection;
+using Microsoft.AspNetCore.Routing;
 
 namespace Infra.DI
 {
@@ -31,25 +32,28 @@ namespace Infra.DI
 
         public static IHealthChecksBuilder CheckSystem(this IHealthChecksBuilder builder)
         {
-            return builder.AddDiskStorageHealthCheck(options => 
-            options.WithCheckAllDrives(), name: "disk_storage")
-                .AddApplicationStatus(name: "application");
+            builder.AddDiskStorageHealthCheck(options => options.WithCheckAllDrives(), name: "disk_storage");
+            builder.AddApplicationStatus(name: "application");
+
+            return builder;
         }
 
         public static IServiceCollection AddHealthCheckUI(this IServiceCollection services)
         {
-            services.AddHealthChecksUI(opt =>
-             opt.SetEvaluationTimeInSeconds(10)
-                .MaximumHistoryEntriesPerEndpoint(10)
-                .SetApiMaxActiveRequests(1))
+            services.AddHealthChecksUI(options =>
+            {
+                options.SetApiMaxActiveRequests(1);
+                options.SetEvaluationTimeInSeconds(10);
+                options.MaximumHistoryEntriesPerEndpoint(10);
+            })
             .AddInMemoryStorage();
 
             return services;
         }
 
-        public static IApplicationBuilder UseHealthCheckEndpoint(this IApplicationBuilder services)
+        public static IEndpointConventionBuilder UseHealthCheckEndpoint(this IEndpointRouteBuilder services)
         {
-            return services.UseHealthChecks("/health", new HealthCheckOptions
+            return services.MapHealthChecks("/health", new HealthCheckOptions
             {
                 Predicate = _ => true,
                 ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
@@ -60,6 +64,14 @@ namespace Infra.DI
                     [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable,
                 },
                 AllowCachingResponses = false
+            });
+        }
+
+        public static IEndpointConventionBuilder UseHealthCheckUIEndpoint(this IEndpointRouteBuilder services)
+        {
+            return services.MapHealthChecksUI(options =>
+            {
+                options.UIPath = "/health-ui";
             });
         }
     }

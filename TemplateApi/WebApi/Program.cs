@@ -12,40 +12,45 @@ builder.Services.AddEndpointsApiExplorer()
      .AddSqlServerDbContext(builder.Configuration, "NewsConnection")
      .AddHttpCLientFactory(builder.Configuration)
      .AddHangFireSchedulerWithInMemoryDb()
+     .AddKeyCloak(builder.Configuration)
      .AddOpenTelemetryInstrumentation()
      .AddExceptionHandler()
      .AddCorsDefinitions()
      .AddJwtDefinitions()
      .AddScheduledJobs()
-     .AddHealthCheckUI()
      .AddRepositories()
      .AddHttpClient()
      .AddFeedRobots()
      .AddMediator()
      .AddLogging();
 
-builder.Services.AddHealthChecks()
-            .CheckSqlServer(builder.Configuration, "NewsConnection")
-            .CheckSystem();
+builder.Services
+    .AddHealthChecks()
+    .CheckSystem()
+    .CheckSqlServer(builder.Configuration, "NewsConnection");
+
+builder.Services.AddHealthCheckUI();
 
 WebApplication app = builder.Build();
 
 app.UseRouting()
-            .UseAuthentication()
-            .UseAuthorization()
-            .UseHealthCheckEndpoint();
+    .UseAuthentication()
+    .UseAuthorization()
+    .UseExceptionHandler()
+    .UseHttpsRedirection()
+    .UseScheduledJobs()
+    .UseCors()
+    .UseHsts();
 
-if (app.Environment.IsDevelopment())
-    app.UseHealthChecksUI()
-        .UseSwaggerDefinitions();
-
-app.UseProtectedHangFireDashboard()
-            .UseExceptionHandler()
-            .UseHttpsRedirection()
-            .UseScheduledJobs()
-            .UseCors()
-            .UseHsts();
+app.UseHealthCheckEndpoint();
 
 app.MapControllers();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseProtectedHangFireDashboard();
+    app.UseSwaggerDefinitions();
+    app.UseHealthCheckUIEndpoint();
+}
 
 await app.RunAsync();

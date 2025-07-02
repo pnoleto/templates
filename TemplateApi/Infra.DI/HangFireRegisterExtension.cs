@@ -64,9 +64,6 @@ namespace Infra.DI
             IRecurringJobManager recurringJobManager = app.ApplicationServices
                 .GetRequiredService<IRecurringJobManager>();
 
-            IBackgroundJobClient backgroundJobFactory = app.ApplicationServices
-                .GetRequiredService<IBackgroundJobClient>();
-
             recurringJobManager.AddOrUpdate<FeedsJob>(nameof(FeedsJob), recurringJob => recurringJob
                 .ExecuteAsync(new CancellationTokenSource().Token), Cron.Daily(11, 00));
 

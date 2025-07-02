@@ -7,7 +7,7 @@ namespace WebApi.Controllers.v1
     /// <summary>
     /// Base to develop all controller in the applciation
     /// </summary>
-    [Authorize,
+    [Authorize(AuthenticationSchemes = "Bearer"),
      ApiController,
      ApiVersion("1.0"),
      Route("api/v{version:apiVersion}/[controller]")]

@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Keycloak.AuthServices.Authentication;
+using Keycloak.AuthServices.Authorization;
+using Keycloak.AuthServices.Sdk;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Shared;
 using System.IdentityModel.Tokens.Jwt;
@@ -46,6 +50,18 @@ namespace Infra.DI
                  .RequireAuthenticatedUser());
 
             services.AddScoped<JwtSecurityTokenHandler>();
+
+            return services;
+        }
+    }
+
+    public static class KeyCloackJwtSecurrity
+    {
+        public static IServiceCollection AddKeyCloak(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddKeycloakWebApiAuthentication(configuration.GetRequiredSection(KeycloakAuthenticationOptions.Section));
+            services.AddKeycloakAuthorization(configuration.GetRequiredSection(KeycloakProtectionClientOptions.Section));
+            services.AddKeycloakAdminHttpClient(configuration.GetRequiredSection(KeycloakAdminClientOptions.Section));
 
             return services;
         }
