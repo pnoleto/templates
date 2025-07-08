@@ -16,7 +16,7 @@ namespace Infra.DI
 
                 ArgumentNullException.ThrowIfNull(requiredHosts);
 
-                options.DefaultRequestHeaders.Add("Content-Type", ["text/html", "text/html"]);
+                options.DefaultRequestHeaders.Add("Content-Type", ["text/html", "application/json", "application/xml"]);
                 options.DefaultRequestHeaders.Add("Authorization", "Bearer {MY_TOKEN}");
                 options.BaseAddress = new Uri(requiredHosts[0]);
                 options.Timeout = TimeSpan.FromSeconds(30);

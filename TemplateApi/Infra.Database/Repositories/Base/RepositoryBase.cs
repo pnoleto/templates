@@ -1,14 +1,13 @@
 ﻿using Domain.Models.Base;
 using Domain.Interfaces.Repositories.Base;
 using Microsoft.EntityFrameworkCore.Storage;
-using Infra.Database.ModelDbContext;
 
 namespace Infra.Database.Repositories.Base
 {
-    public class RepositoryBase<T>(NewsDbContext dbContext) : SelectRepositoryBase<T>(dbContext), IRepositoryBase<T> where T : ModelBase
+    public class RepositoryBase<T>(ModelDbContext.MainDbContext dbContext) : SelectRepositoryBase<T>(dbContext), IRepositoryBase<T> where T : ModelBase
     {
         private IDbContextTransaction? _transaction;
-        private readonly NewsDbContext _dbContext = dbContext;
+        private readonly ModelDbContext.MainDbContext _dbContext = dbContext;
 
         public T Add(T entity)
         {

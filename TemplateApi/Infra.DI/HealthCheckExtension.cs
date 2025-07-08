@@ -1,5 +1,4 @@
-﻿using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,12 +6,13 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.ApplicationStatus.DependencyInjection;
 using Microsoft.AspNetCore.Routing;
+using HealthChecks.UI.Client;
 
 namespace Infra.DI
 {
     public static class HealthCheckExtension
     {
-        public static IHealthChecksBuilder CheckSqlServer(this IHealthChecksBuilder builder, IConfiguration configuration, string connectionStringName)
+        public static IHealthChecksBuilder CheckPostgreSql(this IHealthChecksBuilder builder, IConfiguration configuration, string connectionStringName)
         {
             string? connectionString = configuration.GetConnectionString(connectionStringName);
 
@@ -20,7 +20,7 @@ namespace Infra.DI
 
             ArgumentNullException.ThrowIfNull(connectionString);
 
-            return builder.AddSqlServer(connectionString, name: "sql_server");
+            return builder.AddNpgSql(connectionString, name: "postgres");
         }
 
         public static IHealthChecksBuilder CheckUris(this IHealthChecksBuilder builder, IConfiguration configuration, IEnumerable<Uri> Uris)

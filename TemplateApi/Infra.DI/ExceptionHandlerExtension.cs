@@ -61,8 +61,8 @@ namespace Infra.DI
 
     public static class ExceptionHandlerExtension
     {
-        public static IServiceCollection AddExceptionHandler(this IServiceCollection services) => services
-            .AddProblemDetails(options =>
+        public static IServiceCollection AddExceptionHandler(this IServiceCollection services) =>
+            services.AddProblemDetails(options =>
             {
                 options.CustomizeProblemDetails = context =>
                 {

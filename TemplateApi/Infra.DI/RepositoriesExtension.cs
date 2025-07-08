@@ -8,8 +8,8 @@ namespace Infra.DI
 {
     public static class RepositoriesExtension
     {
-        public static IServiceCollection AddRepositories(this IServiceCollection services) => services
-            .AddTransient(typeof(ISelectRepositoryBase<>), typeof(SelectRepositoryBase<>))
+        public static IServiceCollection AddRepositories(this IServiceCollection services) => 
+            services.AddTransient(typeof(ISelectRepositoryBase<>), typeof(SelectRepositoryBase<>))
             .AddTransient(typeof(IRepositoryBase<>), typeof(RepositoryBase<>))
             .AddTransient<IArticleRepository, ArticleRepository>()
             .AddTransient<ISourceRepository, SourceRepository>()

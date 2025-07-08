@@ -13,28 +13,27 @@ namespace Infra.DI
         {
             ArgumentNullException.ThrowIfNull(services);
 
-            ArgumentNullException.ThrowIfNull(connectionStringName); 
+            ArgumentNullException.ThrowIfNull(connectionStringName);
 
             services.AddSingleton<IDesignTimeDbContextFactory<MigrationsDbContext>, MigrationsDbContextFactory>();
 
             ServiceProvider serviceProvider = services.BuildServiceProvider();
 
-            using (IServiceScope serviceScope = serviceProvider.CreateScope())
-            {
-                string? connectionString = string.Empty;
+            using IServiceScope serviceScope = serviceProvider.CreateScope();
 
-                connectionString = configuration.GetConnectionString(connectionStringName);
+            string? connectionString = string.Empty;
 
-                ArgumentNullException.ThrowIfNull(connectionString);
+            connectionString = configuration.GetConnectionString(connectionStringName);
 
-                IDesignTimeDbContextFactory<MigrationsDbContext> context = serviceProvider.GetRequiredService<IDesignTimeDbContextFactory<MigrationsDbContext>>();
+            ArgumentNullException.ThrowIfNull(connectionString);
 
-                MigrationsDbContext connection = context.CreateDbContext([connectionString]);
+            IDesignTimeDbContextFactory<MigrationsDbContext> context = serviceProvider.GetRequiredService<IDesignTimeDbContextFactory<MigrationsDbContext>>();
 
-                IList<string> migrations = [..connection.Database.GetPendingMigrations()];
+            MigrationsDbContext connection = context.CreateDbContext([connectionString]);
 
-                if (migrations.Any()) connection.Database.Migrate();
-            }
+            IList<string> migrations = [..connection.Database.GetPendingMigrations()];
+
+            if (migrations.Any()) connection.Database.Migrate();
 
             return services;
         }

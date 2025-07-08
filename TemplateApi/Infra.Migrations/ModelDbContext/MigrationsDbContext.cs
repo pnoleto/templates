@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Migrations.ModelDbContext
 {
-    public class MigrationsDbContext(DbContextOptions<NewsDbContext> options) : NewsDbContext(options)
+    public class MigrationsDbContext(DbContextOptions<MainDbContext> options) : MainDbContext(options)
     {
     }
 }

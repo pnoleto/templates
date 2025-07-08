@@ -1,12 +1,11 @@
 ﻿using Domain.Interfaces.Repositories.Base;
-using Infra.Database.ModelDbContext;
 using Domain.Models.Base;
 
 namespace Infra.Database.Repositories.Base
 {
-    public class SelectRepositoryBase<T>(NewsDbContext dbContext) : ISelectRepositoryBase<T> where T : ModelBase
+    public class SelectRepositoryBase<T>(ModelDbContext.MainDbContext dbContext) : ISelectRepositoryBase<T> where T : ModelBase
     {
-        private readonly NewsDbContext _dbContext = dbContext;
+        private readonly ModelDbContext.MainDbContext _dbContext = dbContext;
 
         public IEnumerable<T> Get(Func<T, bool> query)
         {

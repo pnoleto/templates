@@ -9,9 +9,9 @@ namespace Infra.Migrations.Factories
         private const int MaxRetryCount = 3;
         private const int MaxBatchSize = 5;
 
-        public static DbContextOptionsBuilder<NewsDbContext> SqlServerDefaultOptions(string connectionString)
+        public static DbContextOptionsBuilder<MainDbContext> SqlServerDefaultOptions(string connectionString)
         {
-            return new DbContextOptionsBuilder<NewsDbContext>()
+            return new DbContextOptionsBuilder<MainDbContext>()
                     .UseSqlServer(connectionString, options => options
                     .MigrationsAssembly(typeof(MigrationsDbContext).Assembly)
                     .MigrationsHistoryTable("Migrations")

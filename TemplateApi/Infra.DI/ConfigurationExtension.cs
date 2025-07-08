@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Shared;
+using Shared.Settings;
 
 namespace Infra.DI
 {
@@ -16,8 +16,7 @@ namespace Infra.DI
 
         public static IHostApplicationBuilder AddConfigurationItems(this IHostApplicationBuilder builder)
         {
-            builder.Services
-            .AddSingleton(config => builder.Configuration.LoadConfig<CorsSettings>("Cors"));
+            builder.Services.AddSingleton(config => builder.Configuration.LoadConfig<CorsSettings>("Cors"));
 
             return builder;
         }

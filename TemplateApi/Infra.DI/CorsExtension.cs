@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Shared;
+using Shared.Settings;
 
 namespace Infra.DI
 {
