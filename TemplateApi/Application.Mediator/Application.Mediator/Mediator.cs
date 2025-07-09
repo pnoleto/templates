@@ -60,17 +60,19 @@ namespace Application.Mediator
             return x.ServiceType.Name == typeof(IEventHandler<,>).Name || x.ServiceType.Name == typeof(IEventHandler<>).Name;
         }
 
+        private IEnumerable<(ServiceDescriptor service, Type eventType)> loadAllServiceInstances()
+        {
+            return from ServiceDescriptor service in _services.Where(x => IsEventHandler(x))
+                   let eventType = service.ServiceType.GenericTypeArguments[0]
+                   select (service, eventType);
+        }
+
         private void LoadAllHandlers()
         {
             ServiceProvider provider = _services.BuildServiceProvider();
 
-
-            foreach ((ServiceDescriptor service, Type eventType) in from ServiceDescriptor service in _services.Where(x => IsEventHandler(x))
-                                                 let eventType = service.ServiceType.GenericTypeArguments[0]
-                                                 select (service, eventType))
-            {
+            foreach ((ServiceDescriptor service, Type eventType) in loadAllServiceInstances())
                 _workflows[eventType] = (IEventHandlerBase)provider.GetRequiredService(service.ServiceType);
-            }
         }
 
         public Task Send<TEvent>(TEvent request, CancellationToken cancellationToken) where TEvent : IEvent
