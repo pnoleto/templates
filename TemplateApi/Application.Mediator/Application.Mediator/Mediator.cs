@@ -1,6 +1,7 @@
 ﻿using Application.Mediator.Interface;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using System.Linq;
 
 namespace Application.Mediator
 {
@@ -31,8 +32,7 @@ namespace Application.Mediator
                 services.AddSingleton(serviceType, type.AsType());
             }
 
-            return services.AddSingleton<IMediator>(new Mediator(services))
-                .AddSingleton<IQueryMediator>(new QueryMediator(services));
+            return services.AddSingleton<IMediator>(new Mediator(services));
         }
 
         private static bool IsEventHandler(TypeInfo handlerType)
@@ -55,15 +55,21 @@ namespace Application.Mediator
             LoadAllHandlers();
         }
 
+        private static bool IsEventHandler(ServiceDescriptor x)
+        {
+            return x.ServiceType.Name == typeof(IEventHandler<,>).Name || x.ServiceType.Name == typeof(IEventHandler<>).Name;
+        }
+
         private void LoadAllHandlers()
         {
             ServiceProvider provider = _services.BuildServiceProvider();
 
-            foreach (ServiceDescriptor service in _services.Where(x => x.ServiceType.Name == typeof(IEventHandler<>).Name))
-            {
-                Type eventType = service.ServiceType.GenericTypeArguments[0];
 
-                _workflows[eventType] = (IEventHandlerBase)provider.GetService(service.ServiceType);
+            foreach ((ServiceDescriptor service, Type eventType) in from ServiceDescriptor service in _services.Where(x => IsEventHandler(x))
+                                                 let eventType = service.ServiceType.GenericTypeArguments[0]
+                                                 select (service, eventType))
+            {
+                _workflows[eventType] = (IEventHandlerBase)provider.GetRequiredService(service.ServiceType);
             }
         }
 
@@ -73,32 +79,6 @@ namespace Application.Mediator
 
             return ((IEventHandler<TEvent>)srv).Execute(request, cancellationToken);
         }
-    }
-
-
-    public class QueryMediator : IQueryMediator
-    {
-        private readonly Dictionary<Type, IEventHandlerBase> _workflows = [];
-        private readonly IServiceCollection _services;
-
-        public QueryMediator(IServiceCollection services)
-        {
-            _services = services;
-
-            LoadAllHandlers();
-        }
-
-        private void LoadAllHandlers()
-        {
-            ServiceProvider provider = _services.BuildServiceProvider();
-
-            foreach (ServiceDescriptor service in _services.Where(x => x.ServiceType.Name == typeof(IEventHandler<,>).Name))
-            {
-                Type eventType = service.ServiceType.GenericTypeArguments[0];
-
-                _workflows[eventType] = (IEventHandlerBase)provider.GetService(service.ServiceType);
-            }
-        }
 
         public Task<TResponse> Send<TEvent, TResponse>(TEvent request, CancellationToken cancellationToken) where TEvent : IEvent<TResponse>
         {
@@ -106,6 +86,6 @@ namespace Application.Mediator
 
             return ((IEventHandler<TEvent, TResponse>)srv).Execute(request, cancellationToken);
         }
-
     }
+
 }

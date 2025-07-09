@@ -12,7 +12,7 @@ namespace Template.Api.Controllers.v1;
 /// <param name="mediator"></param>
 /// <param name="queryMediator"></param>
 [ControllerName("home")]
-public class HomeController(IMediator mediator, IQueryMediator queryMediator) : ControllerBase
+public class HomeController(IMediator mediator) : ControllerBase
 {
     /// <summary>
     /// 
@@ -21,7 +21,7 @@ public class HomeController(IMediator mediator, IQueryMediator queryMediator) : 
     [HttpGet, Route("")]
     public async Task<ActionResult> GetAsync()
     {
-        return Ok(queryMediator.Send<Test1, Result>(new Test1(), new CancellationToken()));
+        return Ok(mediator.Send<Test1, Result>(new Test1(), new CancellationToken()));
     }
 
 }
