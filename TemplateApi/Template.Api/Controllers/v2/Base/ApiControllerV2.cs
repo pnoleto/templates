@@ -1,5 +1,5 @@
 ﻿using Asp.Versioning;
-using Microsoft.AspNetCore.Mvc;
+using Template.Api.Controllers.Base;
 
 namespace Template.Api.Controllers.v2.Base
 {
@@ -7,5 +7,5 @@ namespace Template.Api.Controllers.v2.Base
     /// Base to develop all controller in the applciation
     /// </summary>
     [ApiVersion(2)]
-    public abstract class ControllerV2 : ControllerBase { }
+    public abstract class ControllerV2 : VersionedControllerBase { }
 }

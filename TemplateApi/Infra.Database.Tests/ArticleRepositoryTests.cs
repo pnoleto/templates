@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Shared.Mediator;
-using Shared.Mediator.Interface;
+﻿using Application.Mediator;
+using Application.Mediator.Interface;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Infra.Database.Tests
 {

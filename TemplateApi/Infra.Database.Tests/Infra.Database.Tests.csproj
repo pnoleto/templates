@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application.Mediator\Application.Mediator\Application.Mediator.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Infra.Database\Infra.Database.csproj" />
     <ProjectReference Include="..\Infra.DI\Infra.DI.csproj" />

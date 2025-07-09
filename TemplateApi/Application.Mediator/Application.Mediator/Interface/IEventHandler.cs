@@ -1,4 +1,4 @@
-﻿namespace Shared.Mediator.Interface
+﻿namespace Application.Mediator.Interface
 {
     public interface IEventHandlerBase
     {

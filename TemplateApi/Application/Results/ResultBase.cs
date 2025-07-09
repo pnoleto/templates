@@ -1,7 +1,6 @@
 ﻿namespace Application.Results
 {
-    public class Result
+    public class ResultBase
     {
-
     }
 }

@@ -1,29 +1,27 @@
-﻿using Asp.Versioning;
+﻿using Application.DTO;
+using Application.Mediator.Interface;
+using Application.Results;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using Shared.Mediator;
-using Shared.Mediator.Interface;
-using Template.Api.Controllers.v2.Base;
 
-namespace Template.Api.Controllers.v1
+namespace Template.Api.Controllers.v1;
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="mediator"></param>
+/// <param name="queryMediator"></param>
+[ControllerName("home")]
+public class HomeController(IMediator mediator, IQueryMediator queryMediator) : ControllerBase
 {
-    [ControllerName("home")]
-    public class HomeController : ControllerV2
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet, Route("")]
+    public async Task<ActionResult> GetAsync()
     {
-        private readonly IMediator _mediator;
-
-        public HomeController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
-        // GET: HomeController
-        [HttpGet, Route("")]
-        public ActionResult Index()
-        {
-            _mediator.Send(new Test(), new CancellationToken());
-            
-            return Ok();
-        }
-
+        return Ok(queryMediator.Send<Test1, Result>(new Test1(), new CancellationToken()));
     }
+
 }

@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application.Mediator\Application.Mediator\Application.Mediator.csproj" />
     <ProjectReference Include="..\Infra.DI\Infra.DI.csproj" />
   </ItemGroup>
 

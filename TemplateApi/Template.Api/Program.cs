@@ -1,5 +1,6 @@
+using Application.DTO;
+using Application.Mediator;
 using Infra.DI;
-using Shared.Mediator;
 using System.Reflection;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -8,7 +9,7 @@ builder.AddConfigurationItems();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer()
      //.ExecuteMigrationsOnStartup(builder.Configuration, "NewsConnection")
-     .LoadAllMediatorWorkflows(Assembly.GetAssembly(typeof(Mediator)))
+     .LoadAllMediatorWorkflows(Assembly.GetAssembly(typeof(Test)))
      .AddHttpCLientFactory(builder.Configuration)
      .AddInMemoryDbContext()
      .AddExceptionHandler()
@@ -18,6 +19,8 @@ builder.Services.AddEndpointsApiExplorer()
      .AddLogging()
      .AddOpenApi("v1")
      .AddOpenApi("v2");
+
+builder.Services.AddApiVersioning();
 
 builder.Services
     .AddHealthChecks()
