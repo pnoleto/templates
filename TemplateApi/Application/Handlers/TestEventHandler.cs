@@ -5,7 +5,7 @@ namespace Application.Handlers
 {
     public class TestEventHandler : IEventHandler<Test>
     {
-        public Task Execute(Test request, CancellationToken cancellationToken)
+        public ValueTask Execute(Test request, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

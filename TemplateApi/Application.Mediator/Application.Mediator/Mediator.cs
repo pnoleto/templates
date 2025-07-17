@@ -1,7 +1,6 @@
-﻿using Application.Mediator.Interface;
+﻿using System.Reflection;
+using Application.Mediator.Interface;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
-using System.Linq;
 
 namespace Application.Mediator
 {
@@ -15,6 +14,18 @@ namespace Application.Mediator
         public static bool IsEventHandlerWithResultConcretClass(this Type type)
         {
             return type.Name == typeof(IEventHandler<,>).Name;
+        }
+
+        public static bool IsEventHandler(TypeInfo handlerType)
+        {
+            Type type = handlerType.ImplementedInterfaces.First();
+
+            return type.IsEventHandlerConcretClass() || type.IsEventHandlerWithResultConcretClass();
+        }
+
+        public static bool IsEventHandler(this ServiceDescriptor x)
+        {
+            return x.ServiceType.Name == typeof(IEventHandler<,>).Name || x.ServiceType.Name == typeof(IEventHandler<>).Name;
         }
 
         public static IServiceCollection LoadAllMediatorWorkflows(this IServiceCollection services, Assembly assembly)
@@ -34,13 +45,6 @@ namespace Application.Mediator
 
             return services.AddSingleton<IMediator>(new Mediator(services));
         }
-
-        private static bool IsEventHandler(TypeInfo handlerType)
-        {
-            Type type = handlerType.ImplementedInterfaces.First();
-
-            return type.IsEventHandlerConcretClass() || type.IsEventHandlerWithResultConcretClass();
-        }
     }
 
     public class Mediator : IMediator
@@ -55,38 +59,33 @@ namespace Application.Mediator
             LoadAllHandlers();
         }
 
-        private static bool IsEventHandler(ServiceDescriptor x)
-        {
-            return x.ServiceType.Name == typeof(IEventHandler<,>).Name || x.ServiceType.Name == typeof(IEventHandler<>).Name;
-        }
-
-        private IEnumerable<(ServiceDescriptor service, Type eventType)> loadAllServiceInstances()
-        {
-            return from ServiceDescriptor service in _services.Where(x => IsEventHandler(x))
+        private IEnumerable<(ServiceDescriptor service, Type eventType)> LoadAllServiceInstances()
+        {          
+            return from ServiceDescriptor service in _services.Where(svc => svc.IsEventHandler())
                    let eventType = service.ServiceType.GenericTypeArguments[0]
                    select (service, eventType);
         }
 
         private void LoadAllHandlers()
         {
-            ServiceProvider provider = _services.BuildServiceProvider();
+            using IServiceScope scope = _services.BuildServiceProvider().CreateScope();
 
-            foreach ((ServiceDescriptor service, Type eventType) in loadAllServiceInstances())
-                _workflows[eventType] = (IEventHandlerBase)provider.GetRequiredService(service.ServiceType);
+            foreach ((ServiceDescriptor service, Type eventType) in LoadAllServiceInstances())
+                _workflows[eventType] = (IEventHandlerBase)scope.ServiceProvider.GetRequiredService(service.ServiceType);
         }
 
-        public Task Send<TEvent>(TEvent request, CancellationToken cancellationToken) where TEvent : IEvent
+        public ValueTask Send<TEvent>(TEvent request, CancellationToken cancellationToken) where TEvent : IEvent
         {
-            var srv = _workflows[request.GetType()];
+            IEventHandlerBase handlerInstance = _workflows[request.GetType()];
 
-            return ((IEventHandler<TEvent>)srv).Execute(request, cancellationToken);
+            return ((IEventHandler<TEvent>)handlerInstance).Execute(request, cancellationToken);
         }
 
-        public Task<TResponse> Send<TEvent, TResponse>(TEvent request, CancellationToken cancellationToken) where TEvent : IEvent<TResponse>
+        public ValueTask<TResponse> Send<TEvent, TResponse>(TEvent request, CancellationToken cancellationToken) where TEvent : IEvent<TResponse>
         {
-            var srv = _workflows[request.GetType()];
+            IEventHandlerBase handlerInstance = _workflows[request.GetType()];
 
-            return ((IEventHandler<TEvent, TResponse>)srv).Execute(request, cancellationToken);
+            return ((IEventHandler<TEvent, TResponse>)handlerInstance).Execute(request, cancellationToken);
         }
     }
 
